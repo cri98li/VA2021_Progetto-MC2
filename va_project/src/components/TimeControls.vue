@@ -18,7 +18,7 @@
     </b-row>
 
 
-    <b-row>
+    <!--<b-row>
       <b-col cols="3">
         <label>Step size [s]: </label>
       </b-col>
@@ -60,7 +60,6 @@
       <b-col cols="3">
       </b-col>
       <b-col>
-          <!--<b-form-input type="range" v-model="currTime" :min="pickedDateSliderMin" :max="pickedDateSliderMax" step="1000" class="w-100"></b-form-input>-->
         <b-progress :animated="playState" :max="pickedDateSliderMax - pickedDateSliderMin">
           <b-progress-bar :value="currTime - pickedDateSliderMin">
             <span>{{ timePrettyPrint(currTime) }}</span>
@@ -79,11 +78,35 @@
       </b-col>
       <b-col>
         <b-form-input id="timeStart" v-model="stop" type="range" :min="pickedDateSliderMin" :max="pickedDateSliderMax" step="1000" class="w-100"></b-form-input>
+        <range-selector :timestamps="ts"></range-selector>
       </b-col>
       <b-col cols="2" class="debug">
         <div>{{ timePrettyPrint(stop) }}</div>
       </b-col>
+    </b-row>-->
+
+    <b-row>
+      <b-col cols="3">
+      </b-col>
+      <b-col>
+        <b-progress :animated="playState" :max="stop - start">
+          <b-progress-bar :value="currTime - start">
+            <span>{{ timePrettyPrint(currTime) }}</span>
+          </b-progress-bar>
+        </b-progress>
+      </b-col>
+      <b-col cols="2">
+        {{timePrettyPrint(currTime)}}
+      </b-col>
     </b-row>
+
+    <b-row>
+      <range-selector
+          :timestamps="ts"
+          @changeTime="updateDate($event)"
+      ></range-selector>
+    </b-row>
+
 
     <b-row>
       <b-button-group>
@@ -93,33 +116,30 @@
       </b-button-group>
     </b-row>
 
-    <b-row>
-      <svg ref="start"></svg>
-    </b-row>
-
-    <b-row>
-      <svg ref="stop"></svg>
-    </b-row>
-
 
   </b-form-group>
   </b-overlay>
 </template>
 
 <script>
+import RangeSelector from "@/components/rangeSelector";
 export default {
   name: "TimeControls",
-
+  components: {RangeSelector},
   props: {
     mapTimeStart: {default: () => new Date("2014-01-06 00:00:00").getTime()},
-    mapTimeStop: {default: () => new Date("2014-01-06 00:01:00").getTime()},
+    mapTimeStop: {default: () => new Date("2014-01-06 23:59:59").getTime()},
 
-    ts: {default: []}
+    ts: {
+      required: true,
+      type: Array,
+      default: () => []
+    }
   },
 
   data(){
     return {
-      pickedDate: "2014-01-13",
+      pickedDate: "",
       pickedDateSliderMin: new Date("2014-01-06 00:00:00").getTime(),
       pickedDateSliderMax: new Date("2014-01-06 23:59:59").getTime(),
       mapTimeMinDistance: 60, //seconds
@@ -127,7 +147,7 @@ export default {
       mapTimeStep: 1,
 
       start: new Date("2014-01-06 00:00:00").getTime(),
-      stop: new Date("2014-01-06 00:01:00").getTime(),
+      stop: new Date("2014-01-06 23:59:59").getTime(),
 
       playState: false,
       currTime: new Date("2014-01-06 00:00:00").getTime(),
@@ -148,6 +168,25 @@ export default {
   },
 
   methods: {
+    updateDate(newVal) {
+      console.log("pickedDate "+this.pickedDate)
+      const dayTimeStamp = new Date(this.pickedDate).getTime()
+
+      console.log("qui")
+
+      this.start = newVal.start +dayTimeStamp
+      this.stop = newVal.stop +dayTimeStamp
+      this.currTime = this.start
+
+      console.log("start "+new Date(this.start))
+
+      this.$emit('changeTime', {
+        start: this.start,
+        stop: this.stop,
+        day: dayTimeStamp
+      });
+    },
+
     datePrettyPrint(YYYY_MM_DD){
       return YYYY_MM_DD;
     },
@@ -158,10 +197,11 @@ export default {
     },
 
     animate(inizio, fine){
-      if(inizio > fine || !this.playState)
+      if(inizio > fine || !this.playState) {
+        this.playState = false;
         return;
+      }
 
-      console.log(inizio);
       this.currTime = inizio + 60 * 1000; //mostra i 30 secondi successivi
 
       this.$emit('changeTime', {
@@ -187,13 +227,14 @@ export default {
         if(!v)
           this.$emit('changeTime', {
             start: this.start,
-            stop: this.stop
+            stop: this.stop,
+            day: null
           });
         this.animate(parseInt(this.currTime), parseInt(this.stop));
       }
     },
 
-    start: {
+    /*start: {
       handler(_){
         let start = parseInt(_);
         let stop = parseInt(this.stop);
@@ -233,6 +274,12 @@ export default {
           stop: stop
         });
       }
+    },*/
+
+    ts:{
+      handler(){
+        console.log("TimeControl --> dati cambiati "+ new Date(this.ts[0]))
+      }
     },
 
     pickedDate: {
@@ -241,14 +288,15 @@ export default {
         this.start = this.pickedDateSliderMin;
         this.pickedDateSliderMax = new Date(newVal+" 23:59:59").getTime();
         this.stop = this.pickedDateSliderMax;
+
+
+        this.$emit('changeTime', {
+          start: this.start,
+          stop: this.stop,
+          day: this.start
+        });
       }
     },
-
-    ts: {
-      handler(){
-        console.log(this.ts);
-      }
-    }
   }
 }
 </script>

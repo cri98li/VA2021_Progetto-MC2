@@ -12,7 +12,7 @@ export default function MapJS() {
     let featureClass = "id";
 
     function me(selection) {
-        const boundaries = selection.node().parentNode.getBoundingClientRect();
+        const boundaries = selection.node().parentNode.getBoundingClientRect()
 
         projection = d3.geoEquirectangular()
             .scale(scale)

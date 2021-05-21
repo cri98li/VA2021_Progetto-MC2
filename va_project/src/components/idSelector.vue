@@ -2,27 +2,29 @@
   <b-overlay :show="loading">
   <b-form-group>
     <h4>Select a Person</h4>
-    <!--<b-form-checkbox-group
-        size="lg"
-        v-model="selected"
-        :options="carIds"
-        value-field="value"
-        text-field="name"
-        disabled-field="disabled"
-        name="buttonsCarId"
-        buttons
-        stacked
-        style="width: 100%"
-    ></b-form-checkbox-group>-->
-
     <div id="carList">
-      <b-table
+      <vue-good-table
           select-mode="multi"
-          :items="carIds"
-          :fields=fields
-          selectable
-          @row-selected="onRowSelected"
+          :rows="carIds"
+          :columns="fields"
+          @on-selected-rows-change="onRowSelected"
+          max-height="calc(500px - 36px)"
+          :fixed-header="true"
           ref="ids"
+          compact-mode
+          :sort-options="{
+            enabled: true,
+            initialSortBy: {field: 'name', type: 'asc'}
+          }"
+          :select-options="{
+            enabled: true,
+            disableSelectInfo: true,
+          }"
+          :search-options="{enabled: true}"
+          :group-options="{
+            enabled: true,
+            headerPosition: 'top'
+          }"
       />
     </div>
   </b-form-group>
@@ -39,23 +41,26 @@ export default {
   data(){
     return {
       carIds: [{
-        value: 0,
-        name: "Loading",
-        disabled: true
+        type: "Loading",
+        children: [{
+          value: 0,
+          name: "Loading",
+          title: "Loading",
+          disabled: true,
+        }]
       }],
 
 
       loading: true,
       selected: [],
-      fields: ["name", "type", "title"],
-
-
-      options: [
-        { text: 'Orange', value: 'orange' },
-        { text: 'Apple', value: 'apple' },
-        { text: 'Pineapple', value: 'pineapple' },
-        { text: 'Grape', value: 'grape' }
-      ]
+      fields: [{
+        label: 'Name',
+        field: 'name'
+      },
+        {
+          label: 'Title',
+          field: 'title'
+        }]
     }
   },
 
@@ -63,7 +68,10 @@ export default {
     d3.csv("/car-assignments.csv").then( data => {
       this.carIds = [];
 
-      data.forEach((d)=> {
+      let c = 0;
+      let map ={};
+
+      data.forEach((d)=>  {
         let value = parseInt(d.CarID);
         let disabled = false;
         if(d.CarID == "") {
@@ -71,60 +79,48 @@ export default {
           disabled = true;
         }
 
-        this.carIds.push({
+        let prop = {
           value: value,
           name: d.LastName + " " + d.FirstName,
-          type : d.CurrentEmploymentType,
           title: d.CurrentEmploymentTitle,
           disabled: disabled
-        })
+        }
+
+        if(map[d.CurrentEmploymentType] != undefined){
+          this.carIds[map[d.CurrentEmploymentType]].children.push(prop)
+        }else{
+          map[d.CurrentEmploymentType] = c++;
+          let list = [prop]
+          this.carIds[map[d.CurrentEmploymentType]] = {name: d.CurrentEmploymentType}
+          this.carIds[map[d.CurrentEmploymentType]].children = list
+        }
       })
 
       this.loading = false;
+      this.$set(this.carIds[2], 'vgtSelected', true);
+
     });
   },
 
   watch: {
     selected: {
-      handler(newVal, oldVal){
-
-        /*newVal.forEach(e => {
-          if(e.value == null){
-            this.$refs.ids.unselectRow(this.carIds.map(d => d.value).indexOf(e.value))
-
-            this.$emit('warning', {
-              title: "ERR",
-              body: "Azione non permessa"
-            });
-            return;
-          }
-        });*/
-
-        if(newVal.length > 2){
-          newVal.filter(v => !oldVal.includes(v)).forEach(e => {
-            this.$refs.ids.unselectRow(this.carIds.map(d => d.value).indexOf(e.value))
-            /*this.$emit('warning', {
-              title: "Errore",
-              body: "Azione non permessa"
-            });*/
-
-            this.$bvToast.toast('Errore', {
-              title: 'Azione non permessa',
-              //autoHideDelay: 5000,
-              //appendToast: true
-            })
-          })
-
-          return;
-        }
-        this.$emit('changeCars', newVal.map((d) => d.value));
+      handler(newVal){
+        this.$emit('changeCars', newVal);
       }
     }
   },
 
   methods: {
     onRowSelected(items) {
-      this.selected = items
+      this.selected = items.selectedRows.map(d => d.value).filter(d => d != null)
+
+      if(this.selected.length != items.selectedRows.length)
+        this.$bvToast.toast('Sono stati selezionati dipendenti senza auto associata', {
+          title: 'Attenzione',
+          //autoHideDelay: 5000,
+          //appendToast: true
+        })
+
     },
   }
 }

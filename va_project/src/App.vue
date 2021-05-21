@@ -16,10 +16,12 @@
         </b-col>
       </b-row>
       <b-row>
+        <b-col cols="12">
         <TimeControls
             @changeTime="updateDate($event)"
             :ts="ts"
         />
+        </b-col>
       </b-row>
     </b-container>
   </div>
@@ -64,17 +66,15 @@ export default {
         ],
       },
 
-      CarID: {
-        value: [1,2],
-        options: [1,3],
-      },
+      CarID: [],
 
-      ts: []
+      ts: [],
 
-      /*TimeControls: {
+      TimeControls: {
         mapTimeStart: new Date("2014-01-06 00:00:00").getTime(),
-        mapTimeStop: new Date("2014-01-06 00:01:00").getTime()
-      }*/
+        mapTimeStop: new Date("2014-01-06 00:01:00").getTime(),
+        mapDate: new Date("2014-01-06 00:00:00").getTime()
+      }
     }
   },
   mounted(){
@@ -96,12 +96,16 @@ export default {
           dID = cf.dimension(d => d.id);
           dTimestamp = cf.dimension(d => d.Timestamp);
 
-          this.refreshMap(dID.filter(false));
+          this.refresh(dID.filter(false));
         });
 
   },
   methods: {
-    refreshMap(cfDimension) {
+    refresh(cfDimension) {
+      //la filter qui perchè i controlli potrebbero essere pronti prima della crossfilter
+      dID.filter(d => this.carIds.indexOf(d) > -1);
+      dTimestamp.filterRange([parseInt(this.TimeControls.mapTimeStart), parseInt(this.TimeControls.mapTimeStop)]);
+
       this.pointCollection = this.getGeoJsonFromReports(cfDimension.top(Infinity));
     },
     getGeoJsonFromReportsPoint(coordinates) {
@@ -110,9 +114,6 @@ export default {
         features:
             coordinates
                 .filter(
-                    /*function (d){
-                      return (d.Timestamp <= mapTimeStop) || (d.Timestamp >= mapTimeStart);
-                    }*/
                     d => (d.Timestamp <= this.TimeControls.mapTimeStop) && (d.Timestamp >= this.TimeControls.mapTimeStart)
                 )
                 .map(d => ({ // for each entry
@@ -133,16 +134,31 @@ export default {
     },
 
     updateDate(newVal) {
-      console.log(new Date(newVal.start))
-      dTimestamp.filterRange([parseInt(newVal.start), parseInt(newVal.stop)]);
+      this.TimeControls.mapTimeStart = newVal.start;
+      this.TimeControls.mapTimeStop = newVal.stop;
+      if(newVal.day != null) {
+        this.TimeControls.mapDate = newVal.day
+        dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate)+ (1000*60*60*24)]);
+        this.ts = this.getTimestampList(dTimestamp.top(Infinity))
+      }
 
-      this.refreshMap(dTimestamp);
+      console.log(newVal)
+
+      this.refresh(dTimestamp);
     },
 
     updateCar(newVal) {
-      dID.filter(d => newVal.indexOf(d) > -1);
-      this.refreshMap(dID);
-      this.ts = dID.top(Infinity);
+      this.carIds = newVal
+      this.refresh(dID);
+    },
+
+    getTimestampList(cf_result){
+      const list = cf_result.map((d) => {
+        return d.Timestamp
+      });
+
+
+      return list;
     },
 
     getGeoJsonFromReports(coordinates) {
@@ -180,11 +196,6 @@ export default {
 <style>
 nav{
   margin-bottom: 24px;
-}
-
-#carList{
-  height: 500px;
-  overflow-y: auto;
 }
 
 .row{
