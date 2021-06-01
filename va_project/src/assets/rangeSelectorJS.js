@@ -1,40 +1,37 @@
-/**
- *
- *  This module will display a map with a symbol encoding for a set of geographical elements
- */
-
 const d3 = require('d3');
-
 
 
 export default function RangeSelector() {
     const dispatch = d3.dispatch("interval");
 
+    let boundaries = {};
     let x;
 
 
     function brushended(event) {
+        console.log("evento")
+
         if (!event.selection) {
+            dispatch.call('interval', this, [x.invert(0).getTime(), x.invert(boundaries.width).getTime()]);
             return;
         }
         const extent =
-            event.selection.map(c => parseInt(x.invert(c)))
+            event.selection.map(c => x.invert(c).getTime())
         ;
 
         dispatch.call('interval', this, extent);
     }
 
     function me(selection) {
-        console.log("ridisegno")
-
         let params = selection.datum();
         let array = [];
 
-        const boundaries = selection.node().getBoundingClientRect();
+        boundaries = selection.node().getBoundingClientRect()
 
-        x = d3.scaleLinear()
+        x = d3.scaleUtc()
             .domain([params.min, params.max])
             .range([0, boundaries.width])
+
 
         let c = 0;
         for(let i = params.min; i < params.max; i += params.step)
@@ -50,7 +47,7 @@ export default function RangeSelector() {
 
         const dim = boundaries.width/array.length;
 
-        var myColor = d3.scaleLinear().domain([0,max])
+        let myColor = d3.scaleLinear().domain([0,max])
             .range(["white", "blue"])
 
         let g = selection.selectAll('rect')
@@ -69,6 +66,17 @@ export default function RangeSelector() {
 
         selection.call(brush);
 
+
+        let x_axis = d3.axisBottom()
+            .scale(x)
+            .tickFormat(d3.utcFormat('%H:%M'));
+
+        selection.selectAll("g.axis")
+            .data([0])
+            .append('g')
+            .attr("class", "axis")
+            .merge(selection)
+            .call(x_axis);
     }
 
     me.on = (eventType, handler) => {

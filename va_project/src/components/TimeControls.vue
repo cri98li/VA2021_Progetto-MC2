@@ -17,74 +17,6 @@
       </b-col>
     </b-row>
 
-
-    <!--<b-row>
-      <b-col cols="3">
-        <label>Step size [s]: </label>
-      </b-col>
-      <b-col>
-        <b-form-input type="number" v-model="mapTimeStep"  min="0"></b-form-input>
-      </b-col>
-      <b-col cols="2" class="debug">
-        <label>{{ mapTimeStep }}</label>
-      </b-col>
-    </b-row>
-
-
-    <b-row>
-      <b-col cols="3">
-        <label>Sticky</label>
-      </b-col>
-      <b-col>
-        <b-checkbox v-model="sticky"></b-checkbox>
-      </b-col>
-      <b-col cols="2" class="debug">
-        <div>{{ sticky }}</div>
-      </b-col>
-    </b-row>
-
-
-    <b-row>
-      <b-col cols="3">
-        <label>Start</label>
-      </b-col>
-      <b-col>
-        <b-form-input id="timeStart" v-model="start" type="range" :min="pickedDateSliderMin" :max="pickedDateSliderMax" step="1000" class="w-100"></b-form-input>
-      </b-col>
-      <b-col cols="2" class="debug">
-        <div>{{ timePrettyPrint(start) }}</div>
-      </b-col>
-    </b-row>
-
-    <b-row>
-      <b-col cols="3">
-      </b-col>
-      <b-col>
-        <b-progress :animated="playState" :max="pickedDateSliderMax - pickedDateSliderMin">
-          <b-progress-bar :value="currTime - pickedDateSliderMin">
-            <span>{{ timePrettyPrint(currTime) }}</span>
-          </b-progress-bar>
-        </b-progress>
-      </b-col>
-      <b-col cols="2">
-        {{timePrettyPrint(currTime)}}
-      </b-col>
-    </b-row>
-
-
-    <b-row>
-      <b-col cols="3">
-        <label>Stop</label>
-      </b-col>
-      <b-col>
-        <b-form-input id="timeStart" v-model="stop" type="range" :min="pickedDateSliderMin" :max="pickedDateSliderMax" step="1000" class="w-100"></b-form-input>
-        <range-selector :timestamps="ts"></range-selector>
-      </b-col>
-      <b-col cols="2" class="debug">
-        <div>{{ timePrettyPrint(stop) }}</div>
-      </b-col>
-    </b-row>-->
-
     <b-row>
       <b-col cols="3">
       </b-col>
@@ -127,8 +59,8 @@ export default {
   name: "TimeControls",
   components: {RangeSelector},
   props: {
-    mapTimeStart: {default: () => new Date("2014-01-06 00:00:00").getTime()},
-    mapTimeStop: {default: () => new Date("2014-01-06 23:59:59").getTime()},
+    mapTimeStart: {default: () => new Date("2014-01-06 00:00:00 GMT").getTime()},
+    mapTimeStop: {default: () => new Date("2014-01-06 23:59:59 GMT").getTime()},
 
     ts: {
       required: true,
@@ -140,17 +72,17 @@ export default {
   data(){
     return {
       pickedDate: "",
-      pickedDateSliderMin: new Date("2014-01-06 00:00:00").getTime(),
-      pickedDateSliderMax: new Date("2014-01-06 23:59:59").getTime(),
+      pickedDateSliderMin: new Date("2014-01-06 00:00:00 GMT").getTime(),
+      pickedDateSliderMax: new Date("2014-01-06 23:59:59 GMT").getTime(),
       mapTimeMinDistance: 60, //seconds
       sticky: false,
       mapTimeStep: 1,
 
-      start: new Date("2014-01-06 00:00:00").getTime(),
-      stop: new Date("2014-01-06 23:59:59").getTime(),
+      start: new Date("2014-01-06 00:00:00 GMT").getTime(),
+      stop: new Date("2014-01-06 23:59:59 GMT").getTime(),
 
       playState: false,
-      currTime: new Date("2014-01-06 00:00:00").getTime(),
+      currTime: new Date("2014-01-06 00:00:00 GMT").getTime(),
 
       loading: true
     };
@@ -169,16 +101,11 @@ export default {
 
   methods: {
     updateDate(newVal) {
-      console.log("pickedDate "+this.pickedDate)
       const dayTimeStamp = new Date(this.pickedDate).getTime()
-
-      console.log("qui")
 
       this.start = newVal.start +dayTimeStamp
       this.stop = newVal.stop +dayTimeStamp
       this.currTime = this.start
-
-      console.log("start "+new Date(this.start))
 
       this.$emit('changeTime', {
         start: this.start,
@@ -276,17 +203,11 @@ export default {
       }
     },*/
 
-    ts:{
-      handler(){
-        console.log("TimeControl --> dati cambiati "+ new Date(this.ts[0]))
-      }
-    },
-
     pickedDate: {
       handler(newVal){
-        this.pickedDateSliderMin = new Date(newVal+" 00:00:00").getTime();
+        this.pickedDateSliderMin = new Date(newVal+" 00:00:00 GMT").getTime();
         this.start = this.pickedDateSliderMin;
-        this.pickedDateSliderMax = new Date(newVal+" 23:59:59").getTime();
+        this.pickedDateSliderMax = new Date(newVal+" 23:59:59 GMT").getTime();
         this.stop = this.pickedDateSliderMax;
 
 

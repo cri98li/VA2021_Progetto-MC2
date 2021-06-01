@@ -1,14 +1,9 @@
-/**
- *
- *  This module will display a map with a symbol encoding for a set of geographical elements
- */
-
 const d3 = require('d3');
 
 export default function MapJS() {
     let projection = d3.geoEquirectangular();
-    let scale = 450000;
-    let center = [24.864487, 36.070512];
+    let scale = 480000;
+    let center = [24.8673, 36.070512];
     let featureClass = "id";
 
     function me(selection) {

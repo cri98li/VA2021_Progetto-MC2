@@ -1,7 +1,7 @@
 <template>
   <b-overlay :show="loading">
-    <svg height="500" width="100%" class="map">
-      <image href="MC2-tourist.jpg"  height="500" width="100%"/>
+    <svg height="500" width="730" class="map">
+      <image href="MC2-tourist.jpg" height="500" width="100%"/>
       <g class="abila" ref="abila"></g>
       <g class="routes" ref="routes"></g>
     </svg>
@@ -109,13 +109,9 @@ export default {
 
 <style>
 
-svg.map{
-  background-color: lightcyan;
-}
-
 g.abila path{
   fill: transparent;
-  stroke: rgba(0,0,0, .3);
+  stroke: rgba(204, 185, 153, .4);
 }
 
 g.routes path{
@@ -134,6 +130,13 @@ g.routes path._1{
   stroke: rgba(0, 0, 255, 0.45);
   fill: transparent;
   stroke-width: 5;
+}
+
+svg > image{
+  y: -5px;
+  x: 4px;
+  transform:  scaleX(.984)
+              scaleY(1.032);
 }
 
 

@@ -1,4 +1,4 @@
-# vast2014mc2
+# va_project
 
 ## Project setup
 ```

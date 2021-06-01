@@ -4,14 +4,14 @@
       <b-navbar-brand>Home</b-navbar-brand>
     </b-navbar>
 
-    <b-container>
+    <b-container fluid="xl">
       <b-row>
-        <b-col>
+        <b-col xl="8" style="text-align: center">
             <Map
                 :featureCollection="pointCollection"
             />
         </b-col>
-        <b-col cols="4">
+        <b-col xl="4">
           <idSelector @changeCars="updateCar($event)"/>
         </b-col>
       </b-row>
@@ -71,9 +71,9 @@ export default {
       ts: [],
 
       TimeControls: {
-        mapTimeStart: new Date("2014-01-06 00:00:00").getTime(),
-        mapTimeStop: new Date("2014-01-06 00:01:00").getTime(),
-        mapDate: new Date("2014-01-06 00:00:00").getTime()
+        mapTimeStart: new Date("2014-01-06 00:00:00 GMT").getTime(),
+        mapTimeStop: new Date("2014-01-06 00:01:00 GMT").getTime(),
+        mapDate: new Date("2014-01-06 00:00:00 GMT").getTime()
       }
     }
   },
@@ -84,7 +84,7 @@ export default {
         .then((data) => {
           const gps = data.map((d) => {
             const r = {
-              Timestamp: +new Date(d.Timestamp).getTime(), //timestamp, lo stesso di sopra
+              Timestamp: +new Date(d.Timestamp+" GMT").getTime(), //timestamp, lo stesso di sopra
               id: +d.id,
               lat: +d.lat,
               long: +d.long
@@ -103,7 +103,6 @@ export default {
   methods: {
     refresh(cfDimension) {
       //la filter qui perchè i controlli potrebbero essere pronti prima della crossfilter
-      dID.filter(d => this.carIds.indexOf(d) > -1);
       dTimestamp.filterRange([parseInt(this.TimeControls.mapTimeStart), parseInt(this.TimeControls.mapTimeStop)]);
 
       this.pointCollection = this.getGeoJsonFromReports(cfDimension.top(Infinity));
@@ -142,14 +141,15 @@ export default {
         this.ts = this.getTimestampList(dTimestamp.top(Infinity))
       }
 
-      console.log(newVal)
-
       this.refresh(dTimestamp);
     },
 
     updateCar(newVal) {
-      this.carIds = newVal
+      this.carIds = newVal;
+      dID.filter(d => this.carIds.indexOf(d) > -1);
+      this.updateDate({start: this.TimeControls.mapTimeStart, stop: this.TimeControls.mapTimeStop, day: this.TimeControls.mapDate})
       this.refresh(dID);
+
     },
 
     getTimestampList(cf_result){
@@ -157,7 +157,14 @@ export default {
         return d.Timestamp
       });
 
+      const trs = Array.from(d3.group(cf_result, c => c.id)).map((d) => {
+        return {
+          id: d[0],
+          timestamp: d[1].sort((a, b) => a.Timestamp - b.Timestamp).map(p => (p.Timestamp)),
+        };
+      });
 
+      console.log(trs)
       return list;
     },
 

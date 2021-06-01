@@ -13,6 +13,13 @@ const d3 = require('d3')
 export default {
   name: "rangeSelector",
 
+  created() {
+    window.addEventListener("resize", this.pageResize);
+  },
+  destroyed() {
+    window.removeEventListener("resize", this.pageResize);
+  },
+
   props: {
     timestamps: {default: () => []}
   },
@@ -41,11 +48,16 @@ export default {
   methods: {
     makeConfig() {
       return {
-        values: this.timestamps.map((d)=>d%this.max),
+        values: this.timestamps.map((d)=>d%this.max), //aggiungo il fuso orario
         min: this.min,
         max: this.max,
         step: this.step //intervalli di 1 s
       }
+    },
+
+    pageResize(){
+      d3.select(this.$refs.rangeSelector)
+          .call(rs);
     }
   },
 
