@@ -8,7 +8,7 @@
           :rows="carIds"
           :columns="fields"
           @on-selected-rows-change="onRowSelected"
-          max-height="calc(500px - 36px)"
+          max-height="385px"
           :fixed-header="true"
           ref="ids"
           compact-mode

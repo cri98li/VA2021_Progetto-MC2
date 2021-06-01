@@ -4,6 +4,7 @@ const d3 = require('d3');
 export default function RangeSelector() {
     const dispatch = d3.dispatch("interval");
 
+    let rif;
     let boundaries = {};
     let x;
 
@@ -23,6 +24,7 @@ export default function RangeSelector() {
     }
 
     function me(selection) {
+        rif = selection;
         let params = selection.datum();
         let array = [];
 
@@ -64,7 +66,7 @@ export default function RangeSelector() {
         const brush = d3.brushX()
             .on('end', brushended);
 
-        selection.call(brush);
+        rif.call(brush);
 
 
         let x_axis = d3.axisBottom()
@@ -81,6 +83,20 @@ export default function RangeSelector() {
 
     me.on = (eventType, handler) => {
         dispatch.on(eventType, handler);
+
+        return me;
+    };
+
+    me.updateCircle = (timestamp) => {
+        rif
+            .selectAll("circle").remove()
+
+        if(timestamp != null)
+            rif.append('circle')
+                .attr('cx', x(timestamp))
+                .attr('cy', (boundaries.height+2)/2)
+                .attr('r', 2)
+                .attr('fill', 'red');
 
         return me;
     };

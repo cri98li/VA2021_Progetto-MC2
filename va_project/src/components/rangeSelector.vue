@@ -1,5 +1,5 @@
 <template>
-  <svg width="100%" height="30px" class="rangeSelector" ref="rangeSelector">
+  <svg width="100%" height="50px" class="rangeSelector" ref="rangeSelector">
     <!--<g class="rangeSelectorG" ref="rangeSelectorG"></g>-->
   </svg>
 </template>
@@ -21,7 +21,9 @@ export default {
   },
 
   props: {
-    timestamps: {default: () => []}
+    timestamps: {default: () => []},
+    currTime: {default: () => 0},
+    playState: {default: () => false}
   },
 
   data() {
@@ -68,6 +70,13 @@ export default {
             .datum(this.makeConfig())
             .call(rs);
       }
+    },
+    currTime: {
+      handler(newVal){
+        if(this.playState)
+          rs.updateCircle(newVal%this.max)
+        else rs.updateCircle(null)
+      }
     }
   },
 }
@@ -75,6 +84,5 @@ export default {
 
 <style scoped>
 .rangeSelector{
-  border: 1px solid red;
 }
 </style>
