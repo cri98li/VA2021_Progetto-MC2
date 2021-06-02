@@ -26,6 +26,7 @@
             :curr-time="currTime"
             :timestamps="ts"
             :playState="playState"
+            :carColors="carColors"
             @changeTime="updateDate($event)"
         ></rangeSelector>
       </b-col>
@@ -49,13 +50,6 @@
           </b-button>
         </b-button-group>
       </b-col>
-      <b-col>
-        <!--<b-progress :animated="playState" :max="stop - start">
-          <b-progress-bar :value="currTime - start">
-            <span>{{ timePrettyPrint(currTime) }}</span>
-          </b-progress-bar>
-        </b-progress>-->
-      </b-col>
       <b-col cols="2">
         {{timePrettyPrint(currTime)}}
       </b-col>
@@ -77,9 +71,10 @@ export default {
 
     ts: {
       required: true,
-      type: Array,
-      default: () => []
-    }
+      default: () => {}
+    },
+
+    carColors : {default: () => {}}
   },
 
   data(){
@@ -147,10 +142,12 @@ export default {
     },
 
     indietro(){
+      this.playState = false
       this.currTime = this.start
     },
 
     avanti(){
+      this.playState = false
       this.currTime = this.stop
     }
   },

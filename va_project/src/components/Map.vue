@@ -27,7 +27,9 @@ export default {
         features: [
           {
             type: 'Feature',
-            properties: {},
+            properties: {
+              color: "red"
+            },
             geometry: {
               type: 'LineString',
               coordinates: [[0, 0], [1, 1]],
@@ -54,41 +56,13 @@ export default {
               .call(map);
         });
 
-    const trajs = d3.group(this.featureCollection.features, d => d.id); // group by id
-    const trs = Array.from(trajs).map((d) => {
-      return {
-        id: d[0],
-        trajs: d[1].map(p => ([ p.long, p.lat ])),
-      };
-    });
-
-    gRoutes.datum(this.getGeoJsonFromReports(trs))
+    gRoutes.datum(this.featureCollection)
         .call(map);
 
     this.loading = false
   },
 
   methods: {
-    getGeoJsonFromReports(coordinates) {
-      const fc = {
-        type: 'FeatureCollection',
-        features: coordinates
-            .map(d => ({ // for each entry
-                  type: 'Feature',
-                  properties: {
-                    Timestamp: d.Timestamp,
-                    id: d.id
-                  },
-                  geometry: {
-                    type: 'LineString',
-                    coordinates: d.trajs,
-                  }
-                })
-            )
-      };
-
-      return fc;
-    },
   },
 
   watch: {
@@ -99,8 +73,6 @@ export default {
       gRoutes.datum(newFc).
       call(map);
 
-      const gAbila = d3.select(this.$refs.abila);
-      gAbila.call(map);
       this.loading = false;
     }
   }
@@ -115,21 +87,9 @@ g.abila path{
 }
 
 g.routes path{
-  stroke: rgba(255, 0, 0, 0.45);
+  opacity: .8;
   fill: transparent;
-  stroke-width: 5;
-}
-
-g.routes path._0{
-  stroke: rgba(0, 255, 0, 0.45);
-  fill: transparent;
-  stroke-width: 5;
-}
-
-g.routes path._1{
-  stroke: rgba(0, 0, 255, 0.45);
-  fill: transparent;
-  stroke-width: 5;
+  stroke-width: 4;
 }
 
 svg > image{

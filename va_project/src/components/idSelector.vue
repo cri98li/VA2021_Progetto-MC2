@@ -25,7 +25,21 @@
             enabled: true,
             headerPosition: 'top'
           }"
-      />
+      >
+        <template slot="table-row" slot-scope="props">
+          <span
+              class="wrap"
+              v-if="props.column.field == 'color'">
+            <span>
+              <!--<verte :value="props.formattedRow[props.column.field]"></verte>-->
+              <div :style="{background: props.formattedRow[props.column.field]}" class="colorPicker"></div>
+            </span>
+          </span>
+          <span v-else>
+            {{props.formattedRow[props.column.field]}}
+          </span>
+        </template>
+      </vue-good-table>
     </div>
   </b-form-group>
   </b-overlay>
@@ -38,6 +52,10 @@ const d3 = require('d3');
 export default {
   name: "idSelector",
 
+  props: {
+    colorSet: {default: ()=>["red"]}
+  },
+
   data(){
     return {
       carIds: [{
@@ -47,20 +65,29 @@ export default {
           name: "Loading",
           title: "Loading",
           disabled: true,
+          color: "red"
         }]
       }],
 
 
       loading: true,
       selected: [],
-      fields: [{
-        label: 'Name',
-        field: 'name'
-      },
+      fields: [
+            {
+              label: 'Name',
+              field: 'name'
+            },
         {
           label: 'Title',
           field: 'title'
-        }]
+        },
+        {
+          label: '',
+          field: 'color',
+          sortable: false,
+          globalSearchDisabled: true,
+        }
+      ]
     }
   },
 
@@ -83,7 +110,8 @@ export default {
           value: value,
           name: d.LastName + " " + d.FirstName,
           title: d.CurrentEmploymentTitle,
-          disabled: disabled
+          disabled: disabled,
+          color: this.colorSet[value%this.colorSet.length]
         }
 
         if(map[d.CurrentEmploymentType] != undefined){
@@ -98,7 +126,6 @@ export default {
 
       this.loading = false;
       this.$set(this.carIds[2], 'vgtSelected', true);
-
     });
   },
 
@@ -107,7 +134,7 @@ export default {
       handler(newVal){
         this.$emit('changeCars', newVal);
       }
-    }
+    },
   },
 
   methods: {
@@ -117,15 +144,18 @@ export default {
       if(this.selected.length != items.selectedRows.length)
         this.$bvToast.toast('Sono stati selezionati dipendenti senza auto associata', {
           title: 'Attenzione',
-          //autoHideDelay: 5000,
-          //appendToast: true
+          autoHideDelay: 5000,
         })
-
-    },
-  }
+    }
+  },
 }
 </script>
 
 <style scoped>
-
+.colorPicker{
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
+  margin: auto;
+}
 </style>

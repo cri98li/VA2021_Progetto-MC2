@@ -4,26 +4,34 @@
       <b-navbar-brand>Home</b-navbar-brand>
     </b-navbar>
 
-    <b-container fluid="xl">
-      <b-row>
-        <b-col xl="8" style="text-align: center">
-            <Map
-                :featureCollection="pointCollection"
-            />
-        </b-col>
-        <b-col xl="4">
-          <idSelector @changeCars="updateCar($event)"/>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12">
-        <TimeControls
-            @changeTime="updateDate($event)"
-            :ts="ts"
-        />
-        </b-col>
-      </b-row>
-    </b-container>
+
+    <b-overlay :show="loading">
+      <b-container fluid="xl">
+
+        <b-row>
+          <b-col xl="8" style="text-align: center" class="xl-no-padding">
+              <Map
+                  :featureCollection="pointCollection"
+                  :carColors="carColors"
+              />
+          </b-col>
+          <b-col xl="4" class="xl-no-padding">
+            <idSelector
+                :colorSet="colorbrewer_colors"
+                @changeCars="updateCar($event)"/>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="12">
+          <TimeControls
+              @changeTime="updateDate($event)"
+              :ts="ts"
+              :carColors="carColors"
+          />
+          </b-col>
+        </b-row>
+      </b-container>
+    </b-overlay>
   </div>
 </template>
 
@@ -70,13 +78,22 @@ export default {
 
       ts: [],
 
+      colorbrewer_colors: ['#e41a1c','#377eb8','#4daf4a',
+        '#984ea3','#ff7f00',//'#ffff33',
+        '#a65628','#f781bf'],
+
+      carColors: {},
+
       TimeControls: {
         mapTimeStart: new Date("2014-01-06 00:00:00 GMT").getTime(),
         mapTimeStop: new Date("2014-01-06 00:01:00 GMT").getTime(),
         mapDate: new Date("2014-01-06 00:00:00 GMT").getTime()
-      }
+      },
+
+      loading: true
     }
   },
+
   mounted(){
 
     fetch('./gps.json')
@@ -97,6 +114,8 @@ export default {
           dTimestamp = cf.dimension(d => d.Timestamp);
 
           this.refresh(dID.filter(false));
+
+          this.loading = false
         });
 
   },
@@ -106,30 +125,6 @@ export default {
       dTimestamp.filterRange([parseInt(this.TimeControls.mapTimeStart), parseInt(this.TimeControls.mapTimeStop)]);
 
       this.pointCollection = this.getGeoJsonFromReports(cfDimension.top(Infinity));
-    },
-    getGeoJsonFromReportsPoint(coordinates) {
-      const fc = {
-        type: 'FeatureCollection',
-        features:
-            coordinates
-                .filter(
-                    d => (d.Timestamp <= this.TimeControls.mapTimeStop) && (d.Timestamp >= this.TimeControls.mapTimeStart)
-                )
-                .map(d => ({ // for each entry
-                      type: 'Feature',
-                      properties: {
-                        Timestamp: d.Timestamp,
-                        id: d.id
-                      },
-                      geometry: {
-                        type: 'Point',
-                        coordinates: [d.long, d.lat],
-                      },
-                    }),
-                )
-      };
-
-      return fc;
     },
 
     updateDate(newVal) {
@@ -146,26 +141,28 @@ export default {
 
     updateCar(newVal) {
       this.carIds = newVal;
+      this.updateColor();
       dID.filter(d => this.carIds.indexOf(d) > -1);
       this.updateDate({start: this.TimeControls.mapTimeStart, stop: this.TimeControls.mapTimeStop, day: this.TimeControls.mapDate})
       this.refresh(dID);
+    },
 
+    updateColor(){
+      this.carColors = {}
+      this.carIds.forEach((d) => {
+        this.carColors[d] = this.colorbrewer_colors[d%this.colorbrewer_colors.length]
+      })
     },
 
     getTimestampList(cf_result){
-      const list = cf_result.map((d) => {
-        return d.Timestamp
-      });
-
-      const trs = Array.from(d3.group(cf_result, c => c.id)).map((d) => {
+      const ts = Array.from(d3.group(cf_result, c => c.id)).map((d) => {
         return {
           id: d[0],
           timestamp: d[1].sort((a, b) => a.Timestamp - b.Timestamp).map(p => (p.Timestamp)),
         };
       });
 
-      console.log(trs)
-      return list;
+      return ts;
     },
 
     getGeoJsonFromReports(coordinates) {
@@ -183,7 +180,8 @@ export default {
             .map(d => ({ // for each entry
                   type: 'Feature',
                   properties: {
-                    id: d.id
+                    id: d.id,
+                    color: this.carColors[d.id]
                   },
                   geometry: {
                     type: 'LineString',
@@ -208,4 +206,16 @@ nav{
 .row{
   margin-bottom: 16px;
 }
+
+.xl-no-padding{
+  padding: 0px !important;
+}
+
+@media only screen and (max-width: 1200px) {
+  .xl-no-padding{
+    padding: 16px !important;
+  }
+}
+
+
 </style>

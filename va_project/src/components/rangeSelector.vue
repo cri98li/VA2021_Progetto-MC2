@@ -1,6 +1,5 @@
 <template>
-  <svg width="100%" height="50px" class="rangeSelector" ref="rangeSelector">
-    <!--<g class="rangeSelectorG" ref="rangeSelectorG"></g>-->
+  <svg width="100%" height="70px" class="rangeSelector" ref="rangeSelector">
   </svg>
 </template>
 
@@ -21,16 +20,17 @@ export default {
   },
 
   props: {
-    timestamps: {default: () => []},
+    timestamps: {default: () => {}},
     currTime: {default: () => 0},
-    playState: {default: () => false}
+    playState: {default: () => false},
+    carColors: {default: () => ['red', 'blue']}
   },
 
   data() {
     return {
       min: 0,
       max: 86400000,
-      step: 60 * 1000
+      step: 60 * 1000 *5
     }
   },
 
@@ -49,11 +49,21 @@ export default {
 
   methods: {
     makeConfig() {
+
+      console.log("leggi")
+      console.log(this.timestamps)
+
       return {
-        values: this.timestamps.map((d)=>d%this.max), //aggiungo il fuso orario
+        values: this.timestamps.map((a)=>{
+          return {
+            id: a.id,
+            ts: a.timestamp.map((d) => d%this.max)
+          }
+      }),
         min: this.min,
         max: this.max,
-        step: this.step //intervalli di 1 s
+        step: this.step, //intervalli di 1 s
+        colors: this.carColors
       }
     },
 

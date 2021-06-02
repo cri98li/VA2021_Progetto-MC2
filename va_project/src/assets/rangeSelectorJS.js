@@ -4,14 +4,14 @@ const d3 = require('d3');
 export default function RangeSelector() {
     const dispatch = d3.dispatch("interval");
 
+    let paddingTop = 17;
+
     let rif;
     let boundaries = {};
     let x;
 
 
     function brushended(event) {
-        console.log("evento")
-
         if (!event.selection) {
             dispatch.call('interval', this, [x.invert(0).getTime(), x.invert(boundaries.width).getTime()]);
             return;
@@ -26,7 +26,6 @@ export default function RangeSelector() {
     function me(selection) {
         rif = selection;
         let params = selection.datum();
-        let array = [];
 
         boundaries = selection.node().getBoundingClientRect()
 
@@ -34,34 +33,48 @@ export default function RangeSelector() {
             .domain([params.min, params.max])
             .range([0, boundaries.width])
 
+        let height = (boundaries.height - paddingTop)/params.values.length;
 
-        let c = 0;
-        for(let i = params.min; i < params.max; i += params.step)
-            array[c++] = 0;
+        selection.selectAll('rect').remove()
 
-        let max = 1;
-        params.values.forEach((d) => {
-            let position = parseInt((d-params.min)/params.step);
-            array[position]++;
-            if(array[position] > max)
-                max = array[position]
-        })
+        for(let i = 0; i < params.values.length; i++) {
+            let array = []
 
-        const dim = boundaries.width/array.length;
+            let c = 0;
+            for (let i = params.min; i < params.max; i += params.step)
+                array[c++] = 0;
 
-        let myColor = d3.scaleLinear().domain([0,max])
-            .range(["white", "blue"])
+            let max = 1;
+            params.values[i].ts.forEach((d) => {
+                let position = parseInt((d - params.min) / params.step);
+                array[position]++;
+                if (array[position] > max)
+                    max = array[position]
+            })
 
-        let g = selection.selectAll('rect')
-            .data(array)
+            const dim = boundaries.width / array.length;
 
-        g.enter()
-            .append('rect')
-            .merge(g)
-            .attr('x', (d, i)=> i*dim)
-            .attr('width', dim)
-            .attr('height', boundaries.height)
-            .attr('fill', myColor)
+            let myColor = d3.scaleLinear().domain([0, max])
+                .range(["white", params.colors[params.values[i].id]])
+
+            let g = selection
+                .selectAll('rect'+params.values[i].id)
+                .data(array)
+
+
+            g.enter()
+                .append('rect')
+                .attr('class', 'rect'+params.values[i].id)
+                .attr('x', (d, i) => i * dim)
+                .attr('y', i * height + paddingTop)
+
+                .attr('fill', "white")
+                .transition()
+                .duration(1000)
+                .attr('fill', myColor)
+                .attr('width', dim)
+                .attr('height', "100%")
+        }
 
         const brush = d3.brushX()
             .on('end', brushended);
@@ -69,16 +82,21 @@ export default function RangeSelector() {
         rif.call(brush);
 
 
-        let x_axis = d3.axisBottom()
+        const x_axis = d3.axisBottom()
             .scale(x)
             .tickFormat(d3.utcFormat('%H:%M'));
 
-        selection.selectAll("g.axis")
+
+        const axis = selection.selectAll("g.axis")
             .data([0])
+
+        axis
             .append('g')
             .attr("class", "axis")
             .merge(selection)
             .call(x_axis);
+
+        selection.select("g.axis").raise()
     }
 
     me.on = (eventType, handler) => {
@@ -94,7 +112,7 @@ export default function RangeSelector() {
         if(timestamp != null)
             rif.append('circle')
                 .attr('cx', x(timestamp))
-                .attr('cy', (boundaries.height+2)/2)
+                .attr('cy', (boundaries.height+paddingTop)/2)
                 .attr('r', 2)
                 .attr('fill', 'red');
 

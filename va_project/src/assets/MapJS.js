@@ -5,6 +5,7 @@ export default function MapJS() {
     let scale = 480000;
     let center = [24.8673, 36.070512];
     let featureClass = "id";
+    let colorClass = "color";
 
     function me(selection) {
         const boundaries = selection.node().parentNode.getBoundingClientRect()
@@ -26,9 +27,13 @@ export default function MapJS() {
 
         selection.selectAll('path')
             .attr('class', (d) => {
-                if (d.properties[featureClass]) {
-                    return "_"+d.properties[featureClass];
-                }
+                if (d.properties[featureClass])
+                    return "_"+d.properties[featureClass]
+                return 'none';
+            })
+            .attr('stroke', (d) => {
+                if (d.properties[colorClass])
+                    return d.properties[colorClass]
                 return 'none';
             })
             .attr('d', path);
