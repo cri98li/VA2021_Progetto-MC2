@@ -29,6 +29,9 @@
           />
           </b-col>
         </b-row>
+        <b-row>
+          <sunburst></sunburst>
+        </b-row>
       </b-container>
     </b-overlay>
   </div>
@@ -44,6 +47,7 @@ import BiMap from 'bidirectional-map'
 
 import Map from '@/components/Map';
 import TimeControls from "@/components/TimeControls";
+import Sunburst from "@/components/sunburst";
 
 let cf; // crossfilter instance
 let dID; // dimension for Id
@@ -54,10 +58,10 @@ let id_to_car_map = new BiMap()
 export default {
   name: 'App',
   components: {
+    Sunburst,
     IdSelector,
     TimeControls,
     Map,
-    //TimeControls
   },
   data() {
     return {
@@ -113,6 +117,8 @@ export default {
           dID = cf.dimension(d => d.id);
           dTimestamp = cf.dimension(d => d.Timestamp);
 
+          dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate)+ (1000*60*60*24)]);
+
           this.loading = false
         });
 
@@ -128,7 +134,6 @@ export default {
   },
   methods: {
     refresh(cfDimension) {
-      //la filter qui perchè i controlli potrebbero essere pronti prima della crossfilter
       dTimestamp.filterRange([parseInt(this.TimeControls.mapTimeStart), parseInt(this.TimeControls.mapTimeStop)]);
 
       this.pointCollection = this.getGeoJsonFromReports(cfDimension.top(Infinity));
@@ -186,6 +191,7 @@ export default {
           trajs: d[1].sort((a, b) => a.Timestamp - b.Timestamp).map(p => ([ p.long, p.lat ])),
         };
       });
+
 
       const fc = {
         type: 'FeatureCollection',

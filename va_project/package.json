@@ -20,7 +20,8 @@
     "d3-geo": "^2.0.1",
     "verte": "^0.0.12",
     "vue": "^2.6.12",
-    "vue-good-table": "^2.21.10"
+    "vue-good-table": "^2.21.10",
+    "vue-plotly": "^1.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

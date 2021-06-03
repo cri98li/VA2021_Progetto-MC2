@@ -67,13 +67,12 @@ export default function RangeSelector() {
                 .attr('class', 'rect'+params.values[i].id)
                 .attr('x', (d, i) => i * dim)
                 .attr('y', i * height + paddingTop)
-
-                .attr('fill', "white")
-                .transition()
-                .duration(1000)
-                .attr('fill', myColor)
                 .attr('width', dim)
-                .attr('height', "100%")
+                .attr('height', height)
+                .attr('fill', 'white') //altrimenti non esegua l'animazione
+                .transition()
+                .duration(500)
+                .attr('fill', myColor)
         }
 
         const brush = d3.brushX()

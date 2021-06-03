@@ -111,7 +111,7 @@ export default {
       this.$emit('changeTime', {
         start: this.start,
         stop: this.stop,
-        day: dayTimeStamp
+        day: null
       });
     },
 
@@ -135,7 +135,8 @@ export default {
 
       this.$emit('changeTime', {
         start: inizio,
-        stop: this.currTime
+        stop: this.currTime,
+        day: null
       });
 
       setTimeout(() => {this.animate(inizio+10*1000, fine)}, 1000/30); //vai avanti di 1 secondi a 30 Hz
