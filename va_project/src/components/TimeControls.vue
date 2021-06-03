@@ -1,10 +1,10 @@
 <template>
   <b-overlay :show="loading">
   <b-form-group>
-    <h4>Time Settings</h4>
+    <h4>Impostazioni temporali</h4>
     <b-row  align-v="center">
       <b-col cols="2">
-        <label>Choose a date:</label>
+        <label>Seleziona un giorno:</label>
       </b-col>
 
       <b-col>
@@ -18,7 +18,7 @@
 
     <b-row align-v="center">
       <b-col cols="2">
-        <label>Choose a date:</label>
+        <label>Seleziona un intervallo orario:</label>
       </b-col>
 
       <b-col>
@@ -111,7 +111,8 @@ export default {
       this.$emit('changeTime', {
         start: this.start,
         stop: this.stop,
-        day: null
+        day: null,
+        playState: this.playState
       });
     },
 
@@ -136,7 +137,8 @@ export default {
       this.$emit('changeTime', {
         start: inizio,
         stop: this.currTime,
-        day: null
+        day: null,
+        playState: this.playState
       });
 
       setTimeout(() => {this.animate(inizio+10*1000, fine)}, 1000/30); //vai avanti di 1 secondi a 30 Hz
@@ -160,7 +162,8 @@ export default {
           this.$emit('changeTime', {
             start: this.start,
             stop: this.stop,
-            day: null
+            day: null,
+            playState: this.playState
           });
         this.animate(parseInt(this.currTime), parseInt(this.stop));
       }
@@ -175,7 +178,8 @@ export default {
         this.$emit('changeTime', {
           start: this.start,
           stop: this.stop,
-          day: this.start
+          day: this.start,
+          playState: this.playState
         });
       }
     },

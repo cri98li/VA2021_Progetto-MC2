@@ -1,7 +1,7 @@
 <template>
   <b-overlay :show="loading">
   <b-form-group>
-    <h4>Select a Person</h4>
+    <h4>Seleziona una persona</h4>
     <div id="carList">
       <vue-good-table
           select-mode="multi"

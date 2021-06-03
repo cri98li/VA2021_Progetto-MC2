@@ -7,7 +7,6 @@
 
     <b-overlay :show="loading">
       <b-container fluid="xl">
-
         <b-row>
           <b-col xl="8" style="text-align: center" class="xl-no-padding">
               <Map
@@ -30,7 +29,13 @@
           </b-col>
         </b-row>
         <b-row>
-          <sunburst></sunburst>
+          <b-col cols="12">
+            <h4>Transazioni</h4>
+            <MySunburst style="height: 400px"
+            :users-color="usersColor"
+            :time-controls="TimeControls"
+            ></MySunburst>
+          </b-col>
         </b-row>
       </b-container>
     </b-overlay>
@@ -47,7 +52,7 @@ import BiMap from 'bidirectional-map'
 
 import Map from '@/components/Map';
 import TimeControls from "@/components/TimeControls";
-import Sunburst from "@/components/sunburst";
+import MySunburst from "@/components/mySunburst";
 
 let cf; // crossfilter instance
 let dID; // dimension for Id
@@ -58,7 +63,7 @@ let id_to_car_map = new BiMap()
 export default {
   name: 'App',
   components: {
-    Sunburst,
+    MySunburst,
     IdSelector,
     TimeControls,
     Map,
@@ -92,7 +97,8 @@ export default {
       TimeControls: {
         mapTimeStart: new Date("2014-01-06 00:00:00 GMT").getTime(),
         mapTimeStop: new Date("2014-01-06 00:01:00 GMT").getTime(),
-        mapDate: new Date("2014-01-06 00:00:00 GMT").getTime()
+        mapDate: new Date("2014-01-06 00:00:00 GMT").getTime(),
+        playState: false
       },
 
       loading: true
@@ -142,6 +148,7 @@ export default {
     updateDate(newVal) {
       this.TimeControls.mapTimeStart = newVal.start;
       this.TimeControls.mapTimeStop = newVal.stop;
+      this.TimeControls.playState = newVal.playState;
       if(newVal.day != null) {
         this.TimeControls.mapDate = newVal.day
         dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate)+ (1000*60*60*24)]);
@@ -154,8 +161,12 @@ export default {
     updateCar(newVal) {
       const carIds = newVal.map(d => id_to_car_map.get(d));
 
-      if(carIds.includes(0))
-        this.$bvToast.toast('Sono stati selezionati dipendenti senza auto associata', {
+      console.log(newVal)
+      console.log(carIds)
+
+      if(carIds.includes(undefined))
+        this.$bvToast.toast('Sono stati selezionati dipendenti senza auto associata, ' +
+            'puoi comunque selezionare un intervallo orario per visualizzare le sue transazioni', {
           title: 'Attenzione',
           autoHideDelay: 5000,
         })
@@ -218,6 +229,8 @@ export default {
 </script>
 
 <style>
+
+
 nav{
   margin-bottom: 24px;
 }

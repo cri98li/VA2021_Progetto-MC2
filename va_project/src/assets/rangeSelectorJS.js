@@ -36,6 +36,26 @@ export default function RangeSelector() {
         let height = (boundaries.height - paddingTop)/params.values.length;
 
         selection.selectAll('rect').remove()
+        selection.selectAll('text.nots').remove()
+
+        if(params.values.length == 0){
+            let rect = selection
+                .selectAll('text.nots')
+                .data([0])
+
+            rect.enter()
+                .append('text')
+                .attr("class", "nots")
+                .attr('x', boundaries.width/2)
+                .attr('y', paddingTop)
+                .attr('height', boundaries.height-paddingTop)
+                .attr('fill', 'red') //altrimenti non esegua l'animazione
+                .text("Nessun segnale gps disponibile")
+                .attr("dy", "1em")
+                .style("font-size", "18px")
+                .transition()
+                .duration(500)
+        }
 
         for(let i = 0; i < params.values.length; i++) {
             let array = []
@@ -44,7 +64,7 @@ export default function RangeSelector() {
             for (let i = params.min; i < params.max; i += params.step)
                 array[c++] = 0;
 
-            let max = 1;
+            let max = 0;
             params.values[i].ts.forEach((d) => {
                 let position = parseInt((d - params.min) / params.step);
                 array[position]++;
