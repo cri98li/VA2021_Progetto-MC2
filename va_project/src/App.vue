@@ -77,8 +77,6 @@ export default {
         ],
       },
 
-      CarID: [],
-
       ts: [],
 
       colorbrewer_colors: ['#e41a1c','#377eb8','#4daf4a',
@@ -98,7 +96,6 @@ export default {
   },
 
   mounted(){
-
     fetch('./gps.json')
         .then(data => data.json())
         .then((data) => {
@@ -150,22 +147,22 @@ export default {
     },
 
     updateCar(newVal) {
-      this.carIds = newVal.map(d => id_to_car_map.get(d));
+      const carIds = newVal.map(d => id_to_car_map.get(d));
 
-      if(this.carIds.includes(0))
+      if(carIds.includes(0))
         this.$bvToast.toast('Sono stati selezionati dipendenti senza auto associata', {
           title: 'Attenzione',
           autoHideDelay: 5000,
         })
 
       this.updateColor(newVal);
-      dID.filter(d => this.carIds.indexOf(d) > -1);
+      dID.filter(d => carIds.indexOf(d) > -1);
       this.updateDate({start: this.TimeControls.mapTimeStart, stop: this.TimeControls.mapTimeStop, day: this.TimeControls.mapDate})
       this.refresh(dID);
     },
 
     updateColor(ids){
-      this.usersColor = []
+      this.usersColor = {}
       ids.forEach((d) => {
         this.usersColor[d] = this.colorbrewer_colors[d%this.colorbrewer_colors.length]
       })
@@ -190,7 +187,6 @@ export default {
         };
       });
 
-
       const fc = {
         type: 'FeatureCollection',
         features: trs
@@ -211,7 +207,7 @@ export default {
     }
   },
   watch: {
-  }
+  },
 }
 </script>
 
