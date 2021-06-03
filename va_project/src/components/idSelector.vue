@@ -64,14 +64,12 @@ export default {
           value: 0,
           name: "Loading",
           title: "Loading",
-          disabled: true,
           color: "red"
         }]
       }],
 
 
       loading: true,
-      selected: [],
       fields: [
             {
               label: 'Name',
@@ -92,60 +90,54 @@ export default {
   },
 
   mounted() {
-    d3.csv("/car-assignments.csv").then( data => {
+    d3.csv("/nomi.csv").then( data => {
       this.carIds = [];
 
       let c = 0;
       let map ={};
 
       data.forEach((d)=>  {
-        let value = parseInt(d.CarID);
-        let disabled = false;
-        if(d.CarID == "") {
-          value = null;
-          disabled = true;
+        let id = parseInt(d.id);
+        let name = d.LastName + " " + d.FirstName;
+        let title = d.CurrentEmploymentTitle;
+        let type = d.CurrentEmploymentType;
+
+        if(title == "") title = "Sconosciuto"
+        if(type == "") type = "Auto assegnata sconosciuta"
+        if(d.LastName == ""){
+          name = "Sconosciuto"
+          type = "Persona assegnata sconosciuta"
         }
 
         let prop = {
-          value: value,
-          name: d.LastName + " " + d.FirstName,
-          title: d.CurrentEmploymentTitle,
-          disabled: disabled,
-          color: this.colorSet[value%this.colorSet.length]
+          value: id,
+          name: name,
+          title: title,
+          color: this.colorSet[id%this.colorSet.length]
         }
 
-        if(map[d.CurrentEmploymentType] != undefined){
-          this.carIds[map[d.CurrentEmploymentType]].children.push(prop)
+        if(map[type] != undefined){
+          this.carIds[map[type]].children.push(prop)
         }else{
-          map[d.CurrentEmploymentType] = c++;
+          map[type] = c++;
           let list = [prop]
-          this.carIds[map[d.CurrentEmploymentType]] = {name: d.CurrentEmploymentType}
-          this.carIds[map[d.CurrentEmploymentType]].children = list
+          this.carIds[map[type]] = {name: type}
+          this.carIds[map[type]].children = list
         }
       })
 
       this.loading = false;
-      this.$set(this.carIds[2], 'vgtSelected', true);
     });
   },
 
   watch: {
-    selected: {
-      handler(newVal){
-        this.$emit('changeCars', newVal);
-      }
-    },
   },
 
   methods: {
     onRowSelected(items) {
-      this.selected = items.selectedRows.map(d => d.value).filter(d => d != null)
+      let selected = items.selectedRows.map(d => d.value).filter(d => d != null)
 
-      if(this.selected.length != items.selectedRows.length)
-        this.$bvToast.toast('Sono stati selezionati dipendenti senza auto associata', {
-          title: 'Attenzione',
-          autoHideDelay: 5000,
-        })
+      this.$emit('changeCars', selected);
     }
   },
 }

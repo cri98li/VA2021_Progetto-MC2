@@ -12,7 +12,6 @@
           <b-col xl="8" style="text-align: center" class="xl-no-padding">
               <Map
                   :featureCollection="pointCollection"
-                  :carColors="carColors"
               />
           </b-col>
           <b-col xl="4" class="xl-no-padding">
@@ -26,7 +25,7 @@
           <TimeControls
               @changeTime="updateDate($event)"
               :ts="ts"
-              :carColors="carColors"
+              :carColors="usersColor"
           />
           </b-col>
         </b-row>
@@ -40,6 +39,8 @@ import IdSelector from "@/components/idSelector";
 const d3 = require('d3');
 
 import crossfilter from 'crossfilter';
+import BiMap from 'bidirectional-map'
+
 
 import Map from '@/components/Map';
 import TimeControls from "@/components/TimeControls";
@@ -47,6 +48,8 @@ import TimeControls from "@/components/TimeControls";
 let cf; // crossfilter instance
 let dID; // dimension for Id
 let dTimestamp;
+
+let id_to_car_map = new BiMap()
 
 export default {
   name: 'App',
@@ -82,7 +85,7 @@ export default {
         '#984ea3','#ff7f00',//'#ffff33',
         '#a65628','#f781bf'],
 
-      carColors: {},
+      usersColor: {},
 
       TimeControls: {
         mapTimeStart: new Date("2014-01-06 00:00:00 GMT").getTime(),
@@ -113,11 +116,18 @@ export default {
           dID = cf.dimension(d => d.id);
           dTimestamp = cf.dimension(d => d.Timestamp);
 
-          this.refresh(dID.filter(false));
-
           this.loading = false
         });
 
+
+
+    d3.csv("/macchine.csv").then( data => {
+      data.forEach((d)=>  {
+        id_to_car_map.set(parseInt(d.id), parseInt(d.CarID))
+      })
+
+      this.loading = false;
+    });
   },
   methods: {
     refresh(cfDimension) {
@@ -140,24 +150,31 @@ export default {
     },
 
     updateCar(newVal) {
-      this.carIds = newVal;
-      this.updateColor();
+      this.carIds = newVal.map(d => id_to_car_map.get(d));
+
+      if(this.carIds.includes(0))
+        this.$bvToast.toast('Sono stati selezionati dipendenti senza auto associata', {
+          title: 'Attenzione',
+          autoHideDelay: 5000,
+        })
+
+      this.updateColor(newVal);
       dID.filter(d => this.carIds.indexOf(d) > -1);
       this.updateDate({start: this.TimeControls.mapTimeStart, stop: this.TimeControls.mapTimeStop, day: this.TimeControls.mapDate})
       this.refresh(dID);
     },
 
-    updateColor(){
-      this.carColors = {}
-      this.carIds.forEach((d) => {
-        this.carColors[d] = this.colorbrewer_colors[d%this.colorbrewer_colors.length]
+    updateColor(ids){
+      this.usersColor = []
+      ids.forEach((d) => {
+        this.usersColor[d] = this.colorbrewer_colors[d%this.colorbrewer_colors.length]
       })
     },
 
     getTimestampList(cf_result){
       const ts = Array.from(d3.group(cf_result, c => c.id)).map((d) => {
         return {
-          id: d[0],
+          id: id_to_car_map.getKey(d[0]),
           timestamp: d[1].sort((a, b) => a.Timestamp - b.Timestamp).map(p => (p.Timestamp)),
         };
       });
@@ -180,8 +197,8 @@ export default {
             .map(d => ({ // for each entry
                   type: 'Feature',
                   properties: {
-                    id: d.id,
-                    color: this.carColors[d.id]
+                    id: id_to_car_map.getKey(d.id),
+                    color: this.usersColor[id_to_car_map.getKey(d.id)]
                   },
                   geometry: {
                     type: 'LineString',

@@ -49,10 +49,6 @@ export default {
 
   methods: {
     makeConfig() {
-
-      console.log("leggi")
-      console.log(this.timestamps)
-
       return {
         values: this.timestamps.map((a)=>{
           return {
