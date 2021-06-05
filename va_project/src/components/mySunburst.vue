@@ -11,7 +11,7 @@
                      :colorGetter="colorGetter"
                      :from="nodes.clicked"
                      :width="width"
-                       :itemWidth="170"/>
+                       :itemWidth="150"/>
 
     <template slot-scope="{ on, actions }">
       <highlightOnHover v-bind="{ on, actions }"/>
@@ -45,17 +45,18 @@ export default {
   components: {
     myBreadcrumbTrail,
     highlightOnHover,
-    //nodeInfoDisplayer,
     sunburst,
     zoomOnClick
   },
 
   props: {
     usersColor: {
+      type: Object,
       default: () => {
       }
     },
     TimeControls: {
+      type: Object,
       default: () => {
         return {
           mapTimeStart: new Date("2014-01-06 00:00:00 GMT").getTime(),
@@ -67,9 +68,14 @@ export default {
     },
 
     scaler:{
-      default: () =>
-        d3.scaleLinear()
+      type: Function,
+      default: d3.scaleLinear()
 
+    },
+
+    colors: {
+      required: true,
+      default: () => ["red"]
     }
   },
 
@@ -90,27 +96,25 @@ export default {
         loyalty_card: row.loyalty_card == "True"
       }
     }).then( (data) => {
-      console.log(data)
-
       cf = crossfilter(data)
       dID = cf.dimension(d => d.id);
       dDate = cf.dimension(d => d.date);
       dTime = cf.dimension(d => d.time);
 
-      dID.filter(() => false)
-      dDate.filter(d => d ==this.TimeControls.mapDate)
+      dID.filter(d => Object.keys(this.usersColor).indexOf(d) > -1);
+      dDate.filter(d => d == this.TimeControls.mapDate)
 
-      console.log(dID)
+      d3.csv("/nomi.csv").then( data => {
+        data.forEach((d)=>  {
+          id_FristLastName.set(d.id, d.LastName+" "+d.FirstName)
+        })
+
+        this.colorScale = d3.scaleOrdinal(this.mappaPersoneColori(), this.colors)
+
+        this.loading = false;
+      });
+
       this.updateData()
-    });
-
-
-    d3.csv("/nomi.csv").then( data => {
-      data.forEach((d)=>  {
-        id_FristLastName.set(d.id, d.LastName+" "+d.FirstName)
-      })
-
-      this.loading = false;
     });
   },
 
@@ -124,7 +128,7 @@ export default {
     },
 
     list_to_tree(data, levels){
-      let newData = { name :"root", children : [] };
+      let newData = { name :"Totale", children : [] };
 
       data.forEach(function(d){
         var depthCursor = newData.children;
@@ -133,20 +137,17 @@ export default {
           var index;
           depthCursor.forEach(function(child,i)
           {
-            if ( d[property] == child.name )
+            if ( d[property] == child.name || (property == "id" && id_FristLastName.get(d[property]) == child.name))
               index = i;
           });
-
-
 
           if ( isNaN(index) )
           {
             if(property == "id") {
-              console.log(d[property])
-
               depthCursor.push({name: id_FristLastName.get(d[property]), children: []});
             }else
               depthCursor.push({name : d[property], children : []});
+
             index = depthCursor.length - 1;
           }
 
@@ -154,13 +155,37 @@ export default {
 
           if ( depth === levels.length - 1 )
           {
-            depthCursor.push({size : d.price, name: new Date(d.time).getUTCHours()+":"+new Date(d.time).getUTCMinutes()});
+            let name = ""
+            const ore = new Date(d.time).getUTCHours();
+            const minuti = new Date(d.time).getUTCMinutes()
+
+            if(d.time != null){
+              if(ore < 10)
+                name += "0"+ore
+              else
+                name += ore
+              if(minuti < 10)
+                name += ":0"+minuti
+              else
+                name += ":"+minuti
+
+            }else
+              name = "Solo C. Fedeltà"
+
+            depthCursor.push({size : d.price, name: name, loyalty_card: d.loyalty_card, credit_card: d.credit_card});
           }
         });
       });
 
       return newData;
     },
+
+    mappaPersoneColori() {
+        let tmp = []
+        for(let i = 0; i < 59; i++)
+          tmp[i] = id_FristLastName.get(i.toString())
+        return tmp
+    }
   },
 
   watch: {
@@ -219,18 +244,9 @@ export default {
         ]
       },
 
-      colorScale: d3.scaleOrdinal(tmp(), ['#e41a1c','#377eb8','#4daf4a',
-        '#984ea3','#ff7f00',//'#ffff33',
-        '#a65628','#f781bf'])
+      colorScale: d3.scaleOrdinal()
     }
   },
-}
-
-function tmp(){
-  let tmp = []
-  for(let i = 0; i < 59; i++)
-    tmp[i] = i
-  return tmp
 }
 
 </script>

@@ -129,7 +129,12 @@ export default {
       if (!current) {
         return "";
       }
-      return current.value.toFixed(2)+"$";
+      let additionalInfo = "";
+
+      if(!current.data.loyalty_card && current.data.credit_card)
+        additionalInfo = "Nessuna C. Fedeltà";
+
+      return current.value.toFixed(2)+"$ "+additionalInfo;
     }
   }
 };

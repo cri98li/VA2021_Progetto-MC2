@@ -8,7 +8,7 @@
       </b-col>
 
       <b-col>
-        <b-form-datepicker id="datepicker" v-model="pickedDate" min="2014-01-06" max="2014-01-19" locale="en"></b-form-datepicker>
+        <b-form-datepicker id="datepicker" v-model="pickedDate" min="2014-01-06" max="2014-01-19" locale="it"></b-form-datepicker>
       </b-col>
 
       <b-col cols="2" class="debug">
@@ -27,7 +27,7 @@
             :timestamps="ts"
             :playState="playState"
             :carColors="carColors"
-            @changeTime="updateDate($event)"
+            @changeTime="updateTime($event)"
         ></rangeSelector>
       </b-col>
       <b-col cols="2" class="debug">
@@ -38,20 +38,20 @@
     <b-row align-v="center" >
       <b-col cols="2" offset="5">
         <b-button-group>
-          <b-button v-on:click="indietro()">
+          <b-button v-on:click="slower()">
             <b-icon icon="skip-start"></b-icon>
           </b-button>
           <b-button :pressed.sync="playState">
             <b-icon :hidden="playState" icon="play"></b-icon>
             <b-icon :hidden="!playState" icon="stop"></b-icon>
           </b-button>
-          <b-button v-on:click="avanti()">
+          <b-button v-on:click="faster()">
             <b-icon icon="skip-end"></b-icon>
           </b-button>
         </b-button-group>
       </b-col>
-      <b-col cols="2">
-        {{timePrettyPrint(currTime)}}
+      <b-col offset="3" cols="2">
+        {{timePrettyPrint(currTime)}} <br> x{{playSpeed}}
       </b-col>
     </b-row>
 
@@ -64,17 +64,29 @@
 import RangeSelector from "@/components/rangeSelector";
 export default {
   name: "TimeControls",
-  components: {RangeSelector},
-  props: {
-    mapTimeStart: {default: () => new Date("2014-01-06 00:00:00 GMT").getTime()},
-    mapTimeStop: {default: () => new Date("2014-01-06 23:59:59 GMT").getTime()},
 
-    ts: {
-      required: true,
-      default: () => {}
+  components: {RangeSelector},
+
+  props: {
+    mapTimeStart: {
+      type: Number,
+      default: new Date("2014-01-06 00:00:00 GMT").getTime()
+    },
+    mapTimeStop: {
+      type: Number,
+      default: new Date("2014-01-06 23:59:59 GMT").getTime()
     },
 
-    carColors : {default: () => {}}
+    ts: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
+
+    carColors : {
+      type: Object,
+      default: () => {}
+    }
   },
 
   data(){
@@ -84,6 +96,8 @@ export default {
       start: new Date("2014-01-06 00:00:00 GMT").getTime(),
       stop: new Date("2014-01-06 23:59:59 GMT").getTime(),
 
+      playSpeed: 10,
+
       playState: false,
       currTime: new Date("2014-01-06 00:00:00 GMT").getTime(),
 
@@ -92,8 +106,6 @@ export default {
   },
 
   mounted() {
-    //TODO: codice per trovare automaticamente l'intervallo di date
-
     this.loading = false;
   },
 
@@ -101,12 +113,13 @@ export default {
   },
 
   methods: {
-    updateDate(newVal) {
+    updateTime(newVal) {
       const dayTimeStamp = new Date(this.pickedDate).getTime()
 
       this.start = newVal.start +dayTimeStamp
       this.stop = newVal.stop +dayTimeStamp
       this.currTime = this.start
+      this.playState = false
 
       this.$emit('changeTime', {
         start: this.start,
@@ -141,17 +154,15 @@ export default {
         playState: this.playState
       });
 
-      setTimeout(() => {this.animate(inizio+10*1000, fine)}, 1000/30); //vai avanti di 1 secondi a 30 Hz
+      setTimeout(() => {this.animate(inizio+1000*this.playSpeed, fine)}, 1000/30);
     },
 
-    indietro(){
-      this.playState = false
-      this.currTime = this.start
+    slower(){
+      this.playSpeed /= 2
     },
 
-    avanti(){
-      this.playState = false
-      this.currTime = this.stop
+    faster(){
+      this.playSpeed *= 2
     }
   },
 

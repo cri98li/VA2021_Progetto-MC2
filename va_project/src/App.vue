@@ -34,6 +34,7 @@
             <MySunburst style="height: 400px"
             :users-color="usersColor"
             :time-controls="TimeControls"
+            :colors="colorbrewer_colors"
             ></MySunburst>
           </b-col>
         </b-row>
@@ -96,7 +97,7 @@ export default {
 
       TimeControls: {
         mapTimeStart: new Date("2014-01-06 00:00:00 GMT").getTime(),
-        mapTimeStop: new Date("2014-01-06 00:01:00 GMT").getTime(),
+        mapTimeStop: new Date("2014-01-06 23:59:59 GMT").getTime(),
         mapDate: new Date("2014-01-06 00:00:00 GMT").getTime(),
         playState: false
       },
@@ -160,9 +161,6 @@ export default {
 
     updateCar(newVal) {
       const carIds = newVal.map(d => id_to_car_map.get(d));
-
-      console.log(newVal)
-      console.log(carIds)
 
       if(carIds.includes(undefined))
         this.$bvToast.toast('Sono stati selezionati dipendenti senza auto associata, ' +

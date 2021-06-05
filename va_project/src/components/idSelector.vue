@@ -53,7 +53,10 @@ export default {
   name: "idSelector",
 
   props: {
-    colorSet: {default: ()=>["red"]}
+    colorSet: {
+      type: Array,
+      default: ()=>["red"]
+    }
   },
 
   data(){
@@ -72,11 +75,11 @@ export default {
       loading: true,
       fields: [
             {
-              label: 'Name',
+              label: 'Nome',
               field: 'name'
             },
         {
-          label: 'Title',
+          label: 'Mansione',
           field: 'title'
         },
         {
@@ -103,10 +106,11 @@ export default {
         let type = d.CurrentEmploymentType;
 
         if(title == "") title = "Sconosciuto"
-        if(type == "") type = "Auto assegnata sconosciuta"
+        if(type == "") type = "Nessuna auto assegnata"
         if(d.LastName == ""){
           name = "Sconosciuto"
-          type = "Persona assegnata sconosciuta"
+          title = ""
+          type = "Auto noleggiate a sconosciuti"
         }
 
         let prop = {

@@ -12,6 +12,7 @@ const d3 = require('d3')
 export default {
   name: "rangeSelector",
 
+  //Per ridisegnare il componente se la pagina viene ridimensioata
   created() {
     window.addEventListener("resize", this.pageResize);
   },
@@ -20,10 +21,22 @@ export default {
   },
 
   props: {
-    timestamps: {default: () => {}},
-    currTime: {default: () => 0},
-    playState: {default: () => false},
-    carColors: {default: () => ['red', 'blue']}
+    timestamps: {
+      type: Array,
+      default: () => []
+    },
+    currTime: {
+      type: Number,
+      default: () => 0
+    },
+    playState: {
+      type: Boolean,
+      default: () => false
+    },
+    carColors: {
+      type: Object,
+      default: () => ['red', 'blue']
+    }
   },
 
   data() {
