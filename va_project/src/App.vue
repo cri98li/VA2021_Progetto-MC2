@@ -14,9 +14,9 @@
       <b-container fluid="xl">
         <b-row>
           <b-col xl="8" style="text-align: center" class="xl-no-padding">
-              <Map
-                  :featureCollection="pointCollection"
-              />
+            <Map
+                :featureCollection="pointCollection"
+            />
           </b-col>
           <b-col xl="4" class="xl-no-padding">
             <idSelector
@@ -26,20 +26,20 @@
         </b-row>
         <b-row>
           <b-col cols="12">
-          <TimeControls
-              @changeTime="updateDate($event)"
-              :ts="ts"
-              :carColors="usersColor"
-          />
+            <TimeControls
+                @changeTime="updateDate($event)"
+                :ts="ts"
+                :carColors="usersColor"
+            />
           </b-col>
         </b-row>
         <b-row>
           <b-col cols="12">
             <h4>Transazioni</h4>
             <MySunburst style="height: 400px"
-            :users-color="usersColor"
-            :time-controls="TimeControls"
-            :colors="colorbrewer_colors"
+                        :users-color="usersColor"
+                        :time-controls="TimeControls"
+                        :colors="colorbrewer_colors"
             ></MySunburst>
           </b-col>
         </b-row>
@@ -50,6 +50,7 @@
 
 <script>
 import IdSelector from "@/components/idSelector";
+
 const d3 = require('d3');
 
 import crossfilter from 'crossfilter';
@@ -94,9 +95,9 @@ export default {
 
       ts: [],
 
-      colorbrewer_colors: ['#e41a1c','#377eb8','#4daf4a',
-        '#984ea3','#ff7f00',//'#ffff33',
-        '#a65628','#f781bf'],
+      colorbrewer_colors: ['#e41a1c', '#377eb8', '#4daf4a',
+        '#984ea3', '#ff7f00',//'#ffff33',
+        '#a65628', '#f781bf'],
 
       usersColor: {},
 
@@ -111,13 +112,13 @@ export default {
     }
   },
 
-  mounted(){
+  mounted() {
     fetch('./gps.json')
         .then(data => data.json())
         .then((data) => {
           const gps = data.map((d) => {
             const r = {
-              Timestamp: +new Date(d.Timestamp+" GMT").getTime(), //timestamp, lo stesso di sopra
+              Timestamp: +new Date(d.Timestamp + " GMT").getTime(), //timestamp, lo stesso di sopra
               id: +d.id,
               lat: +d.lat,
               long: +d.long
@@ -129,15 +130,14 @@ export default {
           dID = cf.dimension(d => d.id);
           dTimestamp = cf.dimension(d => d.Timestamp);
 
-          dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate)+ (1000*60*60*24)]);
+          dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate) + (1000 * 60 * 60 * 24)]);
 
           this.loading = false
         });
 
 
-
-    d3.csv("/macchine.csv").then( data => {
-      data.forEach((d)=>  {
+    d3.csv("/macchine.csv").then(data => {
+      data.forEach((d) => {
         id_to_car_map.set(parseInt(d.id), parseInt(d.CarID))
       })
 
@@ -155,9 +155,9 @@ export default {
       this.TimeControls.mapTimeStart = newVal.start;
       this.TimeControls.mapTimeStop = newVal.stop;
       this.TimeControls.playState = newVal.playState;
-      if(newVal.day != null) {
+      if (newVal.day != null) {
         this.TimeControls.mapDate = newVal.day
-        dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate)+ (1000*60*60*24)]);
+        dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate) + (1000 * 60 * 60 * 24)]);
         this.ts = this.getTimestampList(dTimestamp.top(Infinity))
       }
 
@@ -167,7 +167,7 @@ export default {
     updateCar(newVal) {
       const carIds = newVal.map(d => id_to_car_map.get(d));
 
-      if(carIds.includes(undefined))
+      if (carIds.includes(undefined))
         this.$bvToast.toast('Sono stati selezionati dipendenti senza auto associata, ' +
             'puoi comunque selezionare un intervallo orario per visualizzare le sue transazioni', {
           title: 'Attenzione',
@@ -176,18 +176,22 @@ export default {
 
       this.updateColor(newVal);
       dID.filter(d => carIds.indexOf(d) > -1);
-      this.updateDate({start: this.TimeControls.mapTimeStart, stop: this.TimeControls.mapTimeStop, day: this.TimeControls.mapDate})
+      this.updateDate({
+        start: this.TimeControls.mapTimeStart,
+        stop: this.TimeControls.mapTimeStop,
+        day: this.TimeControls.mapDate
+      })
       this.refresh(dID);
     },
 
-    updateColor(ids){
+    updateColor(ids) {
       this.usersColor = {}
       ids.forEach((d) => {
-        this.usersColor[d] = this.colorbrewer_colors[d%this.colorbrewer_colors.length]
+        this.usersColor[d] = this.colorbrewer_colors[d % this.colorbrewer_colors.length]
       })
     },
 
-    getTimestampList(cf_result){
+    getTimestampList(cf_result) {
       const ts = Array.from(d3.group(cf_result, c => c.id)).map((d) => {
         return {
           id: id_to_car_map.getKey(d[0]),
@@ -202,7 +206,7 @@ export default {
       const trs = Array.from(d3.group(coordinates, c => c.id)).map((d) => {
         return {
           id: d[0],
-          trajs: d[1].sort((a, b) => a.Timestamp - b.Timestamp).map(p => ([ p.long, p.lat ])),
+          trajs: d[1].sort((a, b) => a.Timestamp - b.Timestamp).map(p => ([p.long, p.lat])),
         };
       });
 
@@ -226,28 +230,27 @@ export default {
       return fc;
     }
   },
-  watch: {
-  },
+  watch: {},
 }
 </script>
 
 <style>
 
 
-nav{
+nav {
   margin-bottom: 24px;
 }
 
-.row{
+.row {
   margin-bottom: 16px;
 }
 
-.xl-no-padding{
+.xl-no-padding {
   padding: 0px !important;
 }
 
 @media only screen and (max-width: 1200px) {
-  .xl-no-padding{
+  .xl-no-padding {
     padding: 16px !important;
   }
 }

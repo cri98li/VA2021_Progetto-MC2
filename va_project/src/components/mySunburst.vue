@@ -2,15 +2,15 @@
   <sunburst
       :data="data"
       :colorScale="colorScale"
-  class="sunburst">
+      class="sunburst">
 
     <myBreadcrumbTrail slot="legend"
-                     slot-scope="{ nodes, colorGetter, width }"
-                     :current="nodes.mouseOver"
-                     :root="nodes.root"
-                     :colorGetter="colorGetter"
-                     :from="nodes.clicked"
-                     :width="width"
+                       slot-scope="{ nodes, colorGetter, width }"
+                       :current="nodes.mouseOver"
+                       :root="nodes.root"
+                       :colorGetter="colorGetter"
+                       :from="nodes.clicked"
+                       :width="width"
                        :itemWidth="150"/>
 
     <template slot-scope="{ on, actions }">
@@ -30,6 +30,7 @@ import {
 import crossfilter from 'crossfilter';
 import myBreadcrumbTrail from "@/components/vue-d3-sunburst/myBreadcrumbTrail";
 import BiMap from 'bidirectional-map'
+
 const d3 = require('d3');
 
 let id_FristLastName = new BiMap()
@@ -67,7 +68,7 @@ export default {
       }
     },
 
-    scaler:{
+    scaler: {
       type: Function,
       default: d3.scaleLinear()
 
@@ -83,19 +84,19 @@ export default {
     d3.csv("/transazioni.csv", (row) => {
       let time = null;
 
-      if(row.time != "")
-        time = new Date(row.timestamp+" "+row.time+" UTC").getTime()
+      if (row.time != "")
+        time = new Date(row.timestamp + " " + row.time + " UTC").getTime()
 
       return {
         id: row.id,
-        date: new Date(row.timestamp+" GMT").getTime(),
+        date: new Date(row.timestamp + " GMT").getTime(),
         location: row.location,
         price: parseFloat(row.price),
         time: time,
         credit_card: row.credit_card == "True",
         loyalty_card: row.loyalty_card == "True"
       }
-    }).then( (data) => {
+    }).then((data) => {
       cf = crossfilter(data)
       dID = cf.dimension(d => d.id);
       dDate = cf.dimension(d => d.date);
@@ -104,9 +105,9 @@ export default {
       dID.filter(d => Object.keys(this.usersColor).indexOf(d) > -1);
       dDate.filter(d => d == this.TimeControls.mapDate)
 
-      d3.csv("/nomi.csv").then( data => {
-        data.forEach((d)=>  {
-          id_FristLastName.set(d.id, d.LastName+" "+d.FirstName)
+      d3.csv("/nomi.csv").then(data => {
+        data.forEach((d) => {
+          id_FristLastName.set(d.id, d.LastName + " " + d.FirstName)
         })
 
         this.colorScale = d3.scaleOrdinal(this.mappaPersoneColori(), this.colors)
@@ -119,7 +120,7 @@ export default {
   },
 
   methods: {
-    updateData(){
+    updateData() {
       let res = dID.top(Infinity)
 
       const hierarchy = this.list_to_tree(res, ["id", "location"]);
@@ -127,52 +128,48 @@ export default {
       this.data = hierarchy;
     },
 
-    list_to_tree(data, levels){
-      let newData = { name :"Totale", children : [] };
+    list_to_tree(data, levels) {
+      let newData = {name: "Totale", children: []};
 
-      data.forEach(function(d){
+      data.forEach(function (d) {
         var depthCursor = newData.children;
-        levels.forEach(function( property, depth )
-        {
+        levels.forEach(function (property, depth) {
           var index;
-          depthCursor.forEach(function(child,i)
-          {
-            if ( d[property] == child.name || (property == "id" && id_FristLastName.get(d[property]) == child.name))
+          depthCursor.forEach(function (child, i) {
+            if (d[property] == child.name || (property == "id" && id_FristLastName.get(d[property]) == child.name))
               index = i;
           });
 
-          if ( isNaN(index) )
-          {
-            if(property == "id") {
+          if (isNaN(index)) {
+            if (property == "id") {
               depthCursor.push({name: id_FristLastName.get(d[property]), children: []});
-            }else
-              depthCursor.push({name : d[property], children : []});
+            } else
+              depthCursor.push({name: d[property], children: []});
 
             index = depthCursor.length - 1;
           }
 
           depthCursor = depthCursor[index].children;
 
-          if ( depth === levels.length - 1 )
-          {
+          if (depth === levels.length - 1) {
             let name = ""
             const ore = new Date(d.time).getUTCHours();
             const minuti = new Date(d.time).getUTCMinutes()
 
-            if(d.time != null){
-              if(ore < 10)
-                name += "0"+ore
+            if (d.time != null) {
+              if (ore < 10)
+                name += "0" + ore
               else
                 name += ore
-              if(minuti < 10)
-                name += ":0"+minuti
+              if (minuti < 10)
+                name += ":0" + minuti
               else
-                name += ":"+minuti
+                name += ":" + minuti
 
-            }else
+            } else
               name = "Solo C. Fedeltà"
 
-            depthCursor.push({size : d.price, name: name, loyalty_card: d.loyalty_card, credit_card: d.credit_card});
+            depthCursor.push({size: d.price, name: name, loyalty_card: d.loyalty_card, credit_card: d.credit_card});
           }
         });
       });
@@ -181,16 +178,16 @@ export default {
     },
 
     mappaPersoneColori() {
-        let tmp = []
-        for(let i = 0; i < 59; i++)
-          tmp[i] = id_FristLastName.get(i.toString())
-        return tmp
+      let tmp = []
+      for (let i = 0; i < 59; i++)
+        tmp[i] = id_FristLastName.get(i.toString())
+      return tmp
     }
   },
 
   watch: {
     usersColor: {
-      handler(nv){
+      handler(nv) {
         dID.filter(d => Object.keys(nv).indexOf(d) > -1);
 
         this.updateData()
@@ -198,15 +195,15 @@ export default {
     },
 
     TimeControls: {
-      handler(nv){
-        if(nv.playState == true) return;
+      handler(nv) {
+        if (nv.playState == true) return;
 
         dDate.filter(d => {
           return d == nv.mapDate
         });
 
         dTime.filter(d => {
-          if(d == null)
+          if (d == null)
             return true;
 
           return d > nv.mapTimeStart && d < nv.mapTimeStop
@@ -219,9 +216,9 @@ export default {
     }
   },
 
-   data() {
+  data() {
     return {
-      data:  {
+      data: {
         "name": "flare",
         "children": [
           {
@@ -230,13 +227,13 @@ export default {
               {
                 "name": "cluster",
                 "children": [
-                  { "name": "AgglomerativeCluster", "size": 3938 }
+                  {"name": "AgglomerativeCluster", "size": 3938}
                 ]
               },
               {
                 "name": "optimization",
                 "children": [
-                  { "name": "AspectRatioBanker", "size": 7074 }
+                  {"name": "AspectRatioBanker", "size": 7074}
                 ]
               }
             ]
@@ -253,11 +250,11 @@ export default {
 
 <style>
 
-.sunburst .viewport{
+.sunburst .viewport {
   height: 100%;
 }
 
-.sunburst text{
+.sunburst text {
   fill: white;
 }
 

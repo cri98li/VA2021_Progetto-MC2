@@ -43,14 +43,14 @@ export default {
     return {
       min: 0,
       max: 86400000,
-      step: 60 * 1000 *5
+      step: 60 * 1000 * 5
     }
   },
 
   mounted() {
     d3.select(this.$refs.rangeSelector)
-    .datum(this.makeConfig())
-    .call(rs);
+        .datum(this.makeConfig())
+        .call(rs);
 
     rs.on("interval", (d) => {
       this.$emit('changeTime', {
@@ -63,12 +63,12 @@ export default {
   methods: {
     makeConfig() {
       return {
-        values: this.timestamps.map((a)=>{
+        values: this.timestamps.map((a) => {
           return {
             id: a.id,
-            ts: a.timestamp.map((d) => d%this.max)
+            ts: a.timestamp.map((d) => d % this.max)
           }
-      }),
+        }),
         min: this.min,
         max: this.max,
         step: this.step, //intervalli di 1 s
@@ -76,7 +76,7 @@ export default {
       }
     },
 
-    pageResize(){
+    pageResize() {
       d3.select(this.$refs.rangeSelector)
           .call(rs);
     }
@@ -84,16 +84,16 @@ export default {
 
   watch: {
     timestamps: {
-      handler(){
+      handler() {
         d3.select(this.$refs.rangeSelector)
             .datum(this.makeConfig())
             .call(rs);
       }
     },
     currTime: {
-      handler(newVal){
-        if(this.playState)
-          rs.updateCircle(newVal%this.max)
+      handler(newVal) {
+        if (this.playState)
+          rs.updateCircle(newVal % this.max)
         else rs.updateCircle(null)
       }
     }
@@ -102,6 +102,6 @@ export default {
 </script>
 
 <style scoped>
-.rangeSelector{
+.rangeSelector {
 }
 </style>

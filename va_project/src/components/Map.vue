@@ -46,7 +46,7 @@ export default {
     }
   },
 
-  mounted(){
+  mounted() {
     const gAbila = d3.select(this.$refs.abila);
     const gRoutes = d3.select(this.$refs.routes);
 
@@ -62,16 +62,14 @@ export default {
     this.loading = false
   },
 
-  methods: {
-  },
+  methods: {},
 
   watch: {
-    featureCollection(newFc){
+    featureCollection(newFc) {
       this.loading = true;
       const gRoutes = d3.select(this.$refs.routes);
 
-      gRoutes.datum(newFc).
-      call(map);
+      gRoutes.datum(newFc).call(map);
 
       this.loading = false;
     }
@@ -81,22 +79,21 @@ export default {
 
 <style>
 
-g.abila path{
+g.abila path {
   fill: transparent;
   stroke: rgba(204, 185, 153, .5);
 }
 
-g.routes path{
+g.routes path {
   opacity: .7;
   fill: transparent;
   stroke-width: 4;
 }
 
-svg > image{
+svg > image {
   y: -5px;
   x: 4px;
-  transform:  scaleX(.984)
-              scaleY(1.032);
+  transform: scaleX(.984) scaleY(1.032);
 }
 
 

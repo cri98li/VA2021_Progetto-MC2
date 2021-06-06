@@ -27,19 +27,19 @@ export default function RangeSelector() {
         rif = selection;
         let params = selection.datum();
 
-        if(boundaries == null)
+        if (boundaries == null)
             boundaries = selection.node().getBoundingClientRect()
 
         x = x
             .domain([params.min, params.max])
             .range([0, boundaries.width])
 
-        let height = (boundaries.height - paddingTop)/params.values.length;
+        let height = (boundaries.height - paddingTop) / params.values.length;
 
         selection.selectAll('rect').remove()
         selection.selectAll('text.nots').remove()
 
-        if(params.values.length == 0){
+        if (params.values.length == 0) {
             let rect = selection
                 .selectAll('text.nots')
                 .data([0])
@@ -47,9 +47,9 @@ export default function RangeSelector() {
             rect.enter()
                 .append('text')
                 .attr("class", "nots")
-                .attr('x', boundaries.width/2)
+                .attr('x', boundaries.width / 2)
                 .attr('y', paddingTop)
-                .attr('height', boundaries.height-paddingTop)
+                .attr('height', boundaries.height - paddingTop)
                 .attr('fill', 'red') //altrimenti non esegua l'animazione
                 .text("Nessun segnale gps disponibile")
                 .attr("dy", "1em")
@@ -58,7 +58,7 @@ export default function RangeSelector() {
                 .duration(500)
         }
 
-        for(let i = 0; i < params.values.length; i++) {
+        for (let i = 0; i < params.values.length; i++) {
             let array = []
 
             let c = 0;
@@ -79,13 +79,13 @@ export default function RangeSelector() {
                 .range(["white", params.colors[params.values[i].id]])
 
             let g = selection
-                .selectAll('rect'+params.values[i].id)
+                .selectAll('rect' + params.values[i].id)
                 .data(array)
 
 
             g.enter()
                 .append('rect')
-                .attr('class', 'rect'+params.values[i].id)
+                .attr('class', 'rect' + params.values[i].id)
                 .attr('x', (d, i) => i * dim)
                 .attr('y', i * height + paddingTop)
                 .attr('width', dim)
@@ -126,9 +126,8 @@ export default function RangeSelector() {
     };
 
 
-
     me.paddingTop = (_) => {
-        if(!arguments.length) return paddingTop;
+        if (!arguments.length) return paddingTop;
         paddingTop = _;
 
         return me;
@@ -136,22 +135,21 @@ export default function RangeSelector() {
 
 
     me.timeScaler = (_) => {
-        if(!arguments.length) return x;
+        if (!arguments.length) return x;
         x = _;
 
         return me;
     };
 
 
-
     me.updateCircle = (timestamp) => {
         rif
             .selectAll("circle").remove()
 
-        if(timestamp != null)
+        if (timestamp != null)
             rif.append('circle')
                 .attr('cx', x(timestamp))
-                .attr('cy', (boundaries.height+paddingTop)/2)
+                .attr('cy', (boundaries.height + paddingTop) / 2)
                 .attr('r', 2)
                 .attr('fill', 'red');
 

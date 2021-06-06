@@ -28,7 +28,7 @@ export default function MapJS() {
         selection.selectAll('path')
             .attr('class', (d) => {
                 if (d.properties[featureClass])
-                    return "_"+d.properties[featureClass]
+                    return "_" + d.properties[featureClass]
                 return 'none';
             })
             .attr('stroke', (d) => {
