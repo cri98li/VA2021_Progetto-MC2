@@ -71,5 +71,13 @@ export default function MapJS() {
     };
 
 
+    me.colorClass = function (_) {
+        if (!arguments.length) return colorClass;
+        colorClass = _;
+
+        return me;
+    };
+
+
     return me;
 }

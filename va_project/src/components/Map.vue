@@ -83,11 +83,11 @@ export default {
 
 g.abila path{
   fill: transparent;
-  stroke: rgba(204, 185, 153, .4);
+  stroke: rgba(204, 185, 153, .5);
 }
 
 g.routes path{
-  opacity: .8;
+  opacity: .7;
   fill: transparent;
   stroke-width: 4;
 }

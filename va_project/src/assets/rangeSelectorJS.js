@@ -7,8 +7,8 @@ export default function RangeSelector() {
     let paddingTop = 17;
 
     let rif;
-    let boundaries = {};
-    let x;
+    let boundaries = null;
+    let x = d3.scaleUtc();
 
 
     function brushended(event) {
@@ -27,9 +27,10 @@ export default function RangeSelector() {
         rif = selection;
         let params = selection.datum();
 
-        boundaries = selection.node().getBoundingClientRect()
+        if(boundaries == null)
+            boundaries = selection.node().getBoundingClientRect()
 
-        x = d3.scaleUtc()
+        x = x
             .domain([params.min, params.max])
             .range([0, boundaries.width])
 
@@ -123,6 +124,25 @@ export default function RangeSelector() {
 
         return me;
     };
+
+
+
+    me.paddingTop = (_) => {
+        if(!arguments.length) return paddingTop;
+        paddingTop = _;
+
+        return me;
+    };
+
+
+    me.timeScaler = (_) => {
+        if(!arguments.length) return x;
+        x = _;
+
+        return me;
+    };
+
+
 
     me.updateCircle = (timestamp) => {
         rif

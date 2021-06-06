@@ -11,7 +11,7 @@
         <b-form-datepicker id="datepicker" v-model="pickedDate" min="2014-01-06" max="2014-01-19" locale="it"></b-form-datepicker>
       </b-col>
 
-      <b-col cols="2" class="debug">
+      <b-col cols="2">
         <div>{{ datePrettyPrint(pickedDate) }}</div>
       </b-col>
     </b-row>
@@ -30,7 +30,7 @@
             @changeTime="updateTime($event)"
         ></rangeSelector>
       </b-col>
-      <b-col cols="2" class="debug">
+      <b-col cols="2">
         <div>{{ timePrettyPrint(start) }}<br>{{ timePrettyPrint(stop) }}</div>
       </b-col>
     </b-row>
@@ -38,14 +38,14 @@
     <b-row align-v="center" >
       <b-col cols="2" offset="5">
         <b-button-group>
-          <b-button v-on:click="slower()">
-            <b-icon icon="skip-start"></b-icon>
+          <b-button v-on:click="slower()" variant="outline-primary">
+            <b-icon icon="skip-start" ></b-icon>
           </b-button>
-          <b-button :pressed.sync="playState">
+          <b-button :pressed.sync="playState" variant="outline-primary">
             <b-icon :hidden="playState" icon="play"></b-icon>
             <b-icon :hidden="!playState" icon="stop"></b-icon>
           </b-button>
-          <b-button v-on:click="faster()">
+          <b-button v-on:click="faster()" variant="outline-primary">
             <b-icon icon="skip-end"></b-icon>
           </b-button>
         </b-button-group>
@@ -96,7 +96,7 @@ export default {
       start: new Date("2014-01-06 00:00:00 GMT").getTime(),
       stop: new Date("2014-01-06 23:59:59 GMT").getTime(),
 
-      playSpeed: 10,
+      playSpeed: 8,
 
       playState: false,
       currTime: new Date("2014-01-06 00:00:00 GMT").getTime(),
@@ -199,8 +199,5 @@ export default {
 </script>
 
 <style scoped>
-.debug{
-  /*display: none;*/
-}
 
 </style>

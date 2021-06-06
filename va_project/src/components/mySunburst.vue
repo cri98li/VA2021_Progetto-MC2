@@ -257,4 +257,8 @@ export default {
   height: 100%;
 }
 
+.sunburst text{
+  fill: white;
+}
+
 </style>

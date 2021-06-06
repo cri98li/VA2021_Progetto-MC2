@@ -1,7 +1,12 @@
 <template>
   <div id="app">
-    <b-navbar type="dark" variant="dark" class="shadow">
-      <b-navbar-brand>Home</b-navbar-brand>
+    <b-navbar type="dark" variant="primary" class="shadow">
+      <b-navbar-brand>VAST 2014 - mc2</b-navbar-brand>
+      <b-collapse id="nav-text-collapse" is-nav>
+        <b-navbar-nav>
+          <b-nav-text>Cristiano Landi</b-nav-text>
+        </b-navbar-nav>
+      </b-collapse>
     </b-navbar>
 
 
