@@ -253,5 +253,8 @@ nav {
   }
 }
 
+.container-xl{
+  max-width: 1200px !important; /*sfrutto al massimo lo spazio*/
+}
 
 </style>

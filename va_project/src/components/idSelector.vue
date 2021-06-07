@@ -149,8 +149,8 @@ export default {
 
 <style scoped>
 .table{
-  margin-top: 14px;
-  max-height: 440px;
+  margin-top: 17px;
+  max-height: 463px;
   overflow-x: auto;
 }
 .colorPicker {
