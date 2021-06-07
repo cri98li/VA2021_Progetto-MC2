@@ -35,7 +35,6 @@
           <div>{{ timePrettyPrint(start) }}<br>{{ timePrettyPrint(stop) }}</div>
         </b-col>
       </b-row>
-
       <b-row align-v="center">
         <b-col cols="2" offset="5">
           <b-button-group>
@@ -55,8 +54,6 @@
           {{ timePrettyPrint(currTime) }} <br> x{{ playSpeed }}
         </b-col>
       </b-row>
-
-
     </b-form-group>
   </b-overlay>
 </template>

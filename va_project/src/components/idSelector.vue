@@ -8,7 +8,7 @@
             :rows="carIds"
             :columns="fields"
             @on-selected-rows-change="onRowSelected"
-            max-height="385px"
+            class="table"
             :fixed-header="true"
             ref="ids"
             compact-mode
@@ -148,6 +148,11 @@ export default {
 </script>
 
 <style scoped>
+.table{
+  margin-top: 14px;
+  max-height: 440px;
+  overflow-x: auto;
+}
 .colorPicker {
   width: 25px;
   height: 25px;

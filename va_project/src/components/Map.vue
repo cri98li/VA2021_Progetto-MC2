@@ -1,6 +1,6 @@
 <template>
   <b-overlay :show="loading">
-    <svg height="500" width="730" class="map">
+    <svg width="100%" class="map" viewBox="0 0 730 500" preserveAspectRatio="xMidYMid meet">
       <image href="MC2-tourist.jpg" height="500" width="100%"/>
       <g class="abila" ref="abila"></g>
       <g class="routes" ref="routes"></g>
@@ -92,7 +92,7 @@ g.routes path {
 
 svg > image {
   y: -5px;
-  x: 4px;
+  x: 5px;
   transform: scaleX(.984) scaleY(1.032);
 }
 

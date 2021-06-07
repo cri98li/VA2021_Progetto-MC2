@@ -6,14 +6,16 @@ export default function MapJS() {
     let center = [24.8673, 36.070512];
     let featureClass = "id";
     let colorClass = "color";
+    let width = 730
+    let height = 500
 
     function me(selection) {
-        const boundaries = selection.node().parentNode.getBoundingClientRect()
+
 
         projection = d3.geoEquirectangular()
             .scale(scale)
             .center(center)
-            .translate([boundaries.width / 2, boundaries.height / 2]);
+            .translate([width / 2, height / 2]);
 
         let path = d3.geoPath().projection(projection);
 
@@ -58,6 +60,20 @@ export default function MapJS() {
         if (!arguments.length) return center;
         center = _;
         projection.center(center);
+
+        return me;
+    };
+
+    me.height = function (_) {
+        if (!arguments.length) return height;
+        height = _;
+
+        return me;
+    };
+
+    me.width = function (_) {
+        if (!arguments.length) return width;
+        width = _;
 
         return me;
     };

@@ -1,5 +1,6 @@
 <template>
   <svg width="100%" height="70px" class="rangeSelector" ref="rangeSelector">
+    <!-- non uso viewport anche qui perchè altrimenti non scala bene l'asse delle x -->
   </svg>
 </template>
 
@@ -35,7 +36,9 @@ export default {
     },
     carColors: {
       type: Object,
-      default: () => {return {1: 'red', 2: 'blue'}}
+      default: () => {
+        return {1: 'red', 2: 'blue'}
+      }
     }
   },
 
