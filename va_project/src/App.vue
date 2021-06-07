@@ -10,8 +10,8 @@
     </b-navbar>
 
 
-    <b-overlay :show="loading">
-      <b-container fluid="xl">
+    <b-overlay :show="loading != 0">
+      <b-container style="padding-bottom: 200px" fluid="xl">
         <b-row>
           <b-col xl="8" style="text-align: center" class="xl-no-padding">
             <Map
@@ -108,7 +108,7 @@ export default {
         playState: false
       },
 
-      loading: true
+      loading: 2
     }
   },
 
@@ -132,7 +132,7 @@ export default {
 
           dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate) + (1000 * 60 * 60 * 24)]);
 
-          this.loading = false
+          this.loading--
         });
 
 
@@ -141,7 +141,7 @@ export default {
         id_to_car_map.set(parseInt(d.id), parseInt(d.CarID))
       })
 
-      this.loading = false;
+      this.loading--
     });
   },
   methods: {
@@ -235,8 +235,6 @@ export default {
 </script>
 
 <style>
-
-
 nav {
   margin-bottom: 24px;
 }

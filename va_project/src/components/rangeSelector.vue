@@ -35,7 +35,7 @@ export default {
     },
     carColors: {
       type: Object,
-      default: () => ['red', 'blue']
+      default: () => {return {1: 'red', 2: 'blue'}}
     }
   },
 
@@ -43,7 +43,7 @@ export default {
     return {
       min: 0,
       max: 86400000,
-      step: 60 * 1000 * 15
+      step: 60 * 1000 * 10
     }
   },
 
