@@ -19,6 +19,7 @@
             :select-options="{
             enabled: true,
             disableSelectInfo: true,
+            //selectAllByGroup: true,
           }"
             :search-options="{enabled: true}"
             :group-options="{

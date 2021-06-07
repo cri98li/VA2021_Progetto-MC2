@@ -137,7 +137,7 @@ export default {
 
     timePrettyPrint(timestamp) {
       let date = new Date(parseInt(timestamp));
-      return date.toLocaleTimeString([], {timeZone: 'GMT'});
+      return date.toLocaleTimeString(['it'], {timeZone: 'GMT', hour: '2-digit', minute:'2-digit'});
     },
 
     animate(inizio, fine) {

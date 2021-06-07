@@ -43,7 +43,7 @@ export default {
     return {
       min: 0,
       max: 86400000,
-      step: 60 * 1000 * 5
+      step: 60 * 1000 * 15
     }
   },
 
@@ -88,6 +88,8 @@ export default {
         d3.select(this.$refs.rangeSelector)
             .datum(this.makeConfig())
             .call(rs);
+
+        rs.clearBrush()
       }
     },
     currTime: {

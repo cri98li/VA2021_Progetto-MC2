@@ -9,6 +9,10 @@ export default function RangeSelector() {
     let rif;
     let boundaries = null;
     let x = d3.scaleUtc();
+    let colorScaleFunction = d3.scaleLinear();
+
+    const brush = d3.brushX()
+        .on('end', brushended);
 
 
     function brushended(event) {
@@ -27,8 +31,7 @@ export default function RangeSelector() {
         rif = selection;
         let params = selection.datum();
 
-        if (boundaries == null)
-            boundaries = selection.node().getBoundingClientRect()
+        boundaries = selection.node().getBoundingClientRect()
 
         x = x
             .domain([params.min, params.max])
@@ -75,7 +78,7 @@ export default function RangeSelector() {
 
             const dim = boundaries.width / array.length;
 
-            let myColor = d3.scaleLinear().domain([0, max])
+            colorScaleFunction.domain([0, max])
                 .range(["white", params.colors[params.values[i].id]])
 
             let g = selection
@@ -93,11 +96,8 @@ export default function RangeSelector() {
                 .attr('fill', 'white') //altrimenti non esegua l'animazione
                 .transition()
                 .duration(500)
-                .attr('fill', myColor)
+                .attr('fill', colorScaleFunction)
         }
-
-        const brush = d3.brushX()
-            .on('end', brushended);
 
         rif.call(brush);
 
@@ -141,6 +141,12 @@ export default function RangeSelector() {
         return me;
     };
 
+    me.colorScaler = (_) => {
+        if (!arguments.length) return colorScaleFunction;
+        colorScaleFunction = _;
+
+        return me;
+    };
 
     me.updateCircle = (timestamp) => {
         rif
@@ -152,6 +158,13 @@ export default function RangeSelector() {
                 .attr('cy', (boundaries.height + paddingTop) / 2)
                 .attr('r', 2)
                 .attr('fill', 'red');
+
+        return me;
+    };
+
+
+    me.clearBrush = () => {
+        brush.clear(rif);
 
         return me;
     };
