@@ -36,7 +36,7 @@ const d3 = require('d3');
 let id_FristLastName = new BiMap()
 
 let cf; // crossfilter instance
-let dID; // dimension for Id
+//let dID; // dimension for Id
 let dDate;
 let dTime;
 
@@ -88,7 +88,7 @@ export default {
         time = new Date(row.timestamp + " " + row.time + " UTC").getTime()
 
       return {
-        id: row.id,
+        //id: row.id,
         date: new Date(row.timestamp + " GMT").getTime(),
         location: row.location,
         price: parseFloat(row.price),
@@ -98,11 +98,11 @@ export default {
       }
     }).then((data) => {
       cf = crossfilter(data)
-      dID = cf.dimension(d => d.id);
+      //dID = cf.dimension(d => d.id);
       dDate = cf.dimension(d => d.date);
       dTime = cf.dimension(d => d.time);
 
-      dID.filter(d => Object.keys(this.usersColor).indexOf(d) > -1);
+      //dID.filter(d => Object.keys(this.usersColor).indexOf(d) > -1);
       dDate.filter(d => d == this.TimeControls.mapDate)
 
       d3.csv("/nomi.csv").then(data => {
@@ -121,9 +121,9 @@ export default {
 
   methods: {
     updateData() {
-      let res = dID.top(Infinity)
+      let res = dTime.top(Infinity)
 
-      const hierarchy = this.list_to_tree(res, ["id", "location"]);
+      const hierarchy = this.list_to_tree(res, ["location"]);
 
       this.data = hierarchy;
     },
@@ -187,8 +187,8 @@ export default {
 
   watch: {
     usersColor: {
-      handler(nv) {
-        dID.filter(d => Object.keys(nv).indexOf(d) > -1);
+      handler() {
+        //dID.filter(d => Object.keys(nv).indexOf(d) > -1);
 
         this.updateData()
       }
@@ -233,14 +233,13 @@ export default {
               {
                 "name": "optimization",
                 "children": [
-                  {"name": "AspectRatioBanker", "size": 7074}
+                  {"name": "AspectRatioBanker", "size": 7845}
                 ]
               }
             ]
           }
         ]
       },
-
       colorScale: d3.scaleOrdinal()
     }
   },

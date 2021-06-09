@@ -113,27 +113,25 @@ export default {
   },
 
   mounted() {
-    fetch('./gps.json')
-        .then(data => data.json())
-        .then((data) => {
-          const gps = data.map((d) => {
-            const r = {
-              Timestamp: +new Date(d.Timestamp + " GMT").getTime(), //timestamp, lo stesso di sopra
-              id: +d.id,
-              lat: +d.lat,
-              long: +d.long
-            };
-            return r;
-          });
+    d3.csv("/gps.csv").then(data => {
+      const gps = data.map((d) => {
+        const r = {
+          Timestamp: +new Date(d.Timestamp + " GMT").getTime(), //timestamp, lo stesso di sopra
+          id: +d.id,
+          lat: +d.lat,
+          long: +d.long
+        };
+        return r;
+      });
 
-          cf = crossfilter(gps);
-          dID = cf.dimension(d => d.id);
-          dTimestamp = cf.dimension(d => d.Timestamp);
+      cf = crossfilter(gps);
+      dID = cf.dimension(d => d.id);
+      dTimestamp = cf.dimension(d => d.Timestamp);
 
-          dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate) + (1000 * 60 * 60 * 24)]);
+      dTimestamp.filterRange([parseInt(this.TimeControls.mapDate), parseInt(this.TimeControls.mapDate) + (1000 * 60 * 60 * 24)]);
 
-          this.loading--
-        });
+      this.loading--
+    });
 
 
     d3.csv("/macchine.csv").then(data => {
