@@ -162,7 +162,7 @@
                     }
                 }, mounted: function () {
                     var t = this;
-                    l.csv("/nomi.csv").then((function (e) {
+                    l.csv("/VA2021_Progetto-MC2/nomi.csv").then((function (e) {
                         t.carIds = [];
                         var r = 0, n = {};
                         e.forEach((function (e) {
